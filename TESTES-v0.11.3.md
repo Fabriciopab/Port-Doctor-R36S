@@ -22,4 +22,13 @@ O Doctor oferece **Verificar pacote Unity** e o diagnóstico nativo, mas não an
 - O novo verificador foi executado no R36S/dArkOSRE: 293 entradas conferiram; nenhuma ausente, diferente ou recusada.
 - No aparelho, os 29 testes de arquivos/rede passaram sem casos pulados, incluindo as quatro verificações específicas de Linux. Os oito testes novos do verificador Unity também passaram.
 
-Publicação, instalação e capturas da interface são verificadas separadamente. As verificações históricas da [0.11.2](TESTES-v0.11.2.md) não são evidência de instalação desta versão.
+- O tour da interface executou no R36S/dArkOSRE e terminou com `UI tour OK`, código zero. Houve avisos `Could not restore CRTC` na saída; esse teste não certifica retorno visual perfeito ao menu.
+- A [automação de publicação](https://github.com/Fabriciopab/Port-Doctor-R36S/actions/runs/33398342339) concluiu todos os passos. Os cinco arquivos da [release 0.11.3](https://github.com/Fabriciopab/Port-Doctor-R36S/releases/tag/v0.11.3) foram baixados por HTTPS e tiveram tamanho/SHA-256 conferidos.
+- Uma instalação de teste em pasta temporária representando a 0.11.0 recebeu a oferta 0.11.3 e preparou o download real pelo atualizador. Esse teste não executou o instalador.
+
+- O pacote público validado foi transferido ao R36S por USB e instalado com código de saída zero, atualizando a 0.11.0 para 0.11.3. A conexão USB usada no teste estava sem resolução DNS para o GitHub; por isso, o download foi realizado no computador, sem modificar a rede do console.
+- A abertura pelo launcher instalado concluiu `smoke test concluído`, com código zero. As mensagens `Killed` do encerramento do gptokeyb/PortMaster permaneceram no log, mas não houve traceback Lua nesse teste.
+- Conferência pós-instalação: os 63 arquivos instaláveis comparados coincidiram com o pacote público; os 2.952 arquivos preexistentes de configuração, relatórios e histórico de reparos conferiram com o backup, sem diferenças. A instalação anterior ficou em `portdoctor-install-backups/`.
+- O estado do atualizador confirmou versão 0.11.3, origem `Fabriciopab/Port-Doctor-R36S` e nenhuma instalação pendente.
+
+As verificações históricas da [0.11.2](TESTES-v0.11.2.md) permanecem separadas. Nenhum desses testes declara o Hollow Knight corrigido.
