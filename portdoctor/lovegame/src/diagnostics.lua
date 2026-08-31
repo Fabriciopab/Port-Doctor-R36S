@@ -518,6 +518,23 @@ function diagnostics.analyzePort(name, root)
         elseif unityEglState == 'applied' then
             results[#results+1] = item('port_unity_egl','port','Reparo de vídeo Unity','info',
                 'instalado; teste o jogo','A presença do módulo não confirma gameplay, áudio ou ausência de outras falhas.')
+            local graphicsHelper = (os.getenv('PORTDOCTOR_HOME') or '') .. '/tools/unity_graphics.py'
+            if firstLauncher and firstLauncher ~= '' and util.testFile(graphicsHelper) then
+                local graphicsCommand = 'python3 ' .. util.shellQuote(graphicsHelper) .. ' --port-home ' .. quoted
+                    .. ' --launcher ' .. util.shellQuote(firstLauncher)
+                local graphicsState = util.firstLine(commandValue(graphicsCommand .. ' 2>/dev/null', 'unsupported'))
+                if graphicsState == 'available' then
+                    issues = logdoctor.append(issues, {id='unity_graphics',kind='unity_graphics',severity='warn',priority=131,
+                        label='Ajustar tela roxa/preta do Hollow Knight',value='texturas e desfoque',
+                        detail='Neste build verificado, texturas sem redução e desfoque Alto restauraram cenário/personagem. Áudio e controles confirmados no dArkOSRE testado. Preserva quadros e saves; confira sua cópia.',
+                        evidence='Build verificado e configurações atuais incompatíveis com o teste gráfico.',repairable=true})
+                    results[#results+1] = item('port_unity_graphics','port','Texturas e desfoque','warn',
+                        'ajuste disponível','Corrigir neste port cria backup das configurações. Não modifica saves ou drivers.')
+                elseif graphicsState == 'applied' then
+                    results[#results+1] = item('port_unity_graphics','port','Texturas e desfoque','info',
+                        'configuração compatível','Reparos de abertura/imagem presentes. Limite de quadros e efeitos de dano não são alterados. Confirme o funcionamento dentro da fase.')
+                end
+            end
         end
     end
 
@@ -568,7 +585,7 @@ function diagnostics.exportReport(systemResults, portResults, selectedPort)
     local stamp = os.date("%Y%m%d-%H%M%S")
     local path = reportDir .. "/portdoctor-" .. stamp .. ".txt"
     local lines = {
-        "Port Doctor R36S 0.11.4",
+        "Port Doctor R36S 0.11.5",
         "Autor: fabriciopab · https://github.com/Fabriciopab",
         "Gerado em: " .. os.date("%Y-%m-%d %H:%M:%S"),
         "Modo: somente leitura",

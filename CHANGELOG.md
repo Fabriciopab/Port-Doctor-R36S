@@ -1,5 +1,14 @@
 # Histórico de versões
 
+## 0.11.5 — Hollow Knight: abertura e imagem
+
+- Complemento para tela roxa/preta do build validado: texturas sem redução e desfoque Alto, preservando todas as outras preferências.
+- Plano automático aplica EGL e gráficos quando possível; informa a pendência quando faltam preferências do jogo.
+- Página do port oferece correção direta e informa quando as configurações já estão compatíveis; backups e restauração por etapa.
+- Personagem/cenário, áudio e controles confirmados no R36S testado com dArkOSRE. Não certifica todos os pacotes nem partidas prolongadas.
+- Testes de preservação de limite de quadros, VSync, partículas, controles e saves. O experimento de 60 quadros foi descartado e não acompanha esta versão.
+- Instalador pelo menu Tools, permissões automáticas, atualização oficial, créditos e Pix preservados. Nenhum jogo ou dado proprietário é distribuído.
+
 ## 0.11.4
 
 - Receita protegida para o carregador Hollow Knight AArch64 que conserva uma superfície EGL destruída pelo SDL/KMSDRM; identificada no RK3326/dArkOSRE.

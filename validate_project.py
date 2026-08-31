@@ -15,8 +15,8 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parent
 OUTPUTS = Path(os.environ.get('PORTDOCTOR_OUTPUTS', ROOT.parents[1] / "outputs")).resolve()
-INSTALLABLE = OUTPUTS / "Port-Doctor-R36S-v0.11.4.zip"
-EASY_INSTALLER = OUTPUTS / "Port-Doctor-R36S-Instalador-v0.11.4.zip"
+INSTALLABLE = OUTPUTS / "Port-Doctor-R36S-v0.11.5.zip"
+EASY_INSTALLER = OUTPUTS / "Port-Doctor-R36S-Instalador-v0.11.5.zip"
 
 
 def require(condition: bool, message: str):
@@ -435,8 +435,9 @@ def main():
     subprocess.run([sys.executable, str(ROOT / 'test_v0110.py')], check=True)
     subprocess.run([sys.executable, str(ROOT / 'test_unity_audit.py')], check=True)
     subprocess.run([sys.executable, str(ROOT / 'test_unity_egl.py')], check=True)
+    subprocess.run([sys.executable, str(ROOT / 'test_unity_graphics.py')], check=True)
     release = json.loads((ROOT / 'portdoctor/release.json').read_text())
-    require(release['version'] == '0.11.4', 'versão interna não confere')
+    require(release['version'] == '0.11.5', 'versão interna não confere')
     require(release['pix'] == 'fabriciopab@hotmail.com', 'chave Pix divergente')
     require(release['github_owner'] == 'Fabriciopab' and release['github_repository'] == 'Port-Doctor-R36S',
             'canal oficial de atualização divergente')
@@ -492,6 +493,9 @@ def main():
             "portdoctor/tools/install_metadata.py",
             "portdoctor/tools/repair_port.py",
             "portdoctor/tools/unity_audit.py",
+            "portdoctor/tools/unity_egl.py",
+            "portdoctor/tools/unity_graphics.py",
+            "portdoctor/libexec/aarch64/unity-egl-rebind.so",
             "portdoctor/tools/zram-helper.sh",
             "portdoctor/tools/battery.py",
             "portdoctor/tools/memory.py",
@@ -505,6 +509,7 @@ def main():
             "portdoctor/conf/reports/",
         }
         require(not required.difference(names), "arquivos obrigatórios ausentes do ZIP")
+        require(not any(name.endswith('-PROPOSTA.md') for name in names), 'propostas não implementadas não entram na release')
         mode = (archive.getinfo("Port Doctor R36S.sh").external_attr >> 16) & 0o777
         require(mode == 0o755, "launcher não está executável no ZIP")
         for executable in (

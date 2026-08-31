@@ -7,7 +7,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 ROOT = Path(__file__).resolve().parent
 OUTPUTS = Path(os.environ.get('PORTDOCTOR_OUTPUTS', ROOT.parents[1] / "outputs")).resolve()
-VERSION = "0.11.4"
+VERSION = "0.11.5"
 
 
 def publishable(source):
@@ -15,6 +15,7 @@ def publishable(source):
         return False
     relative = source.relative_to(ROOT).as_posix()
     return not (relative.startswith('portdoctor/conf/') or source.name == 'log.txt'
+                or source.name.endswith('-PROPOSTA.md')
                 or source.suffix.lower() in ('.conf', '.log', '.pyc') or source.name in ('credentials', 'update-channel.json'))
 
 

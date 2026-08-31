@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-VERSION="${PORTDOCTOR_INSTALL_VERSION:-0.11.4}"
+VERSION="${PORTDOCTOR_INSTALL_VERSION:-0.11.5}"
 [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || exit 1
 SCRIPT_PATH="$(readlink -f "$0" 2>/dev/null || printf '%s' "$0")"
 BASE="$(CDPATH= cd -- "$(dirname -- "$SCRIPT_PATH")" && pwd)"

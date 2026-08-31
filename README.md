@@ -12,11 +12,11 @@ Criado por **fabriciopab**, para ajudar a comunidade a entender por que um port 
 
 **Sistema operacional usado nos testes: dArkOSRE (base Debian 13).** Esse aviso também aparece na tela inicial do aplicativo e em **Modelo e sistema testados**. dArkOSRE é a referência destes testes; não deve ser confundido com uma validação de todos os outros firmwares chamados dArkOS/ArkOS.
 
-**Novo na 0.11.4:** reparo específico da tela preta do Hollow Knight para o carregador AArch64 identificado nos testes com RK3326/dArkOSRE. O ajuste corrigiu a superfície EGL obsoleta e permitiu capturar a tela de seleção de idioma. O Doctor identifica o build por SHA-256 e oferece a correção na própria página do jogo, com backup. **Não é uma correção universal nem uma certificação de gameplay prolongado.** Veja [diagnóstico, testes e limites](portdoctor/docs/HOLLOW-KNIGHT-EGL.md).
+**Novo na 0.11.5:** correções de abertura e de tela roxa/preta do **Hollow Knight**, reunidas no reparo automático do build AArch64 identificado por SHA-256. Além do módulo EGL, o Doctor ajusta texturas/desfoque quando necessário, com backups. Personagem, cenário, áudio e controles foram confirmados no R36S/dArkOSRE testado. **Não altera limite de quadros, efeitos de dano, saves, clocks ou drivers. Não é uma correção universal.** Veja [como aplicar, testes e limites](portdoctor/docs/HOLLOW-KNIGHT-EGL.md).
 
 ## Instalação rápida — sem SSH e sem chmod
 
-1. Abra [Releases / Downloads](https://github.com/Fabriciopab/Port-Doctor-R36S/releases/latest) e baixe **`Port-Doctor-R36S-Instalador-v0.11.4.zip`** ou o instalador da versão mais recente.
+1. Abra [Releases / Downloads](https://github.com/Fabriciopab/Port-Doctor-R36S/releases/latest) e baixe **`Port-Doctor-R36S-Instalador-v0.11.5.zip`** ou o instalador da versão mais recente.
 2. Extraia o ZIP no computador. Copie a pasta inteira **`Port Doctor R36S Installer`** para **`tools`** no cartão de jogos. No console, ela corresponde a `/roms/tools` ou `/roms2/tools`.
 3. Coloque o cartão novamente no R36S, abra **Tools / Ferramentas** e execute **Instalar Port Doctor R36S**. Se o menu mostrar a pasta do instalador, entre nela primeiro.
 4. Aguarde a conclusão sem desligar. O instalador organiza os arquivos, preserva a instalação anterior e aplica as permissões automaticamente.

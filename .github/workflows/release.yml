@@ -53,6 +53,7 @@ jobs:
           lua5.1 test_ui.lua
           lua5.1 test_ui_storage.lua
           lua5.1 test_ui_updates.lua
+          lua5.1 test_ui_unity.lua
       - name: Publicar somente versão inédita
         env:
           GH_TOKEN: ${{ github.token }}

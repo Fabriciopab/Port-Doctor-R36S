@@ -1392,6 +1392,14 @@ def command_unity_egl(args: argparse.Namespace) -> None:
         fail(str(error))
 
 
+def command_unity_graphics(args: argparse.Namespace) -> None:
+    import unity_graphics
+    try:
+        unity_graphics.apply(args)
+    except (OSError, ValueError, subprocess.SubprocessError) as error:
+        fail(str(error))
+
+
 def command_auto_repair(args: argparse.Namespace) -> None:
     launcher = Path(args.launcher).resolve()
     port_home = Path(args.port_home).resolve()
@@ -1507,7 +1515,21 @@ def command_auto_repair(args: argparse.Namespace) -> None:
         if state == 'available':
             print('Port Doctor: plano automático: corrigir superfície EGL do build Unity validado.')
             command_unity_egl(common)
+            import unity_graphics
+            graphics_state, graphics_reason = unity_graphics.check(port_home, launcher)
+            if graphics_state == 'available':
+                print('Port Doctor: continuar plano: ajustar texturas e desfoque, com backup próprio.')
+                command_unity_graphics(common)
+            elif graphics_state == 'unsupported':
+                print('Port Doctor: EGL aplicado; ajuste gráfico ainda pendente: ' + graphics_reason)
+                print('Abra e feche o jogo para criar preferências, depois analise novamente. Não há confirmação de imagem correta.')
             return
+        if state == 'applied':
+            import unity_graphics
+            if unity_graphics.check(port_home, launcher)[0] == 'available':
+                print('Port Doctor: plano automático: ajustar texturas e desfoque do Hollow Knight validado.')
+                command_unity_graphics(common)
+                return
     if "game.droid is compressed" in lowered or "bitstream/page/packet is not vorbis data" in lowered:
         print("Port Doctor: plano automático: reconstruir o pacote GMLoader para acesso direto aos recursos.")
         command_repack_game_archive(common)
@@ -1584,7 +1606,7 @@ def command_verify(args: argparse.Namespace) -> None:
         if manifest.get("restored") or Path(manifest.get("launcher_path", "")).resolve() != launcher:
             continue
         action = manifest.get("action", "")
-        current = log_snapshot(port_home, launcher, port_home / 'log.txt' if action == 'unity-egl' else None)
+        current = log_snapshot(port_home, launcher, port_home / 'log.txt' if action in ('unity-egl', 'unity-graphics') else None)
         previous = manifest.get("log_before")
         if current is None:
             fail("nenhum log do port foi encontrado; abra o jogo uma vez e tente novamente")
@@ -1606,6 +1628,11 @@ def command_verify(args: argparse.Namespace) -> None:
                 failures.append('o novo log não confirmou a ativação da superfície EGL corrigida')
             if unity_egl.check(port_home, launcher)[0] != 'applied':
                 failures.append('o módulo ou o build mudou depois do reparo')
+        if action == 'unity-graphics':
+            import unity_graphics
+            if unity_graphics.check(port_home, launcher)[0] != 'applied':
+                failures.append('configuração gráfica ou build mudou depois do reparo')
+            print('Port Doctor: tela roxa/preta só pode ser validada olhando a fase; o log não comprova imagem correta.')
         if re.search(r'Segmentation fault|Bus error|SIGBUS|SIGSEGV|SIGILL|SIGABRT|Illegal instruction|'
                      r'FATAL UNHANDLED EXCEPTION|error while loading shared libraries|'
                      r'symbol lookup error|Invalid or corrupt jarfile|OpenAudioDevice failed|'
@@ -1788,6 +1815,8 @@ def parser() -> argparse.ArgumentParser:
 
     unity = sub.add_parser('unity-egl', parents=[common])
     unity.set_defaults(handler=command_unity_egl)
+    unity_graphics = sub.add_parser('unity-graphics', parents=[common])
+    unity_graphics.set_defaults(handler=command_unity_graphics)
 
     restore = sub.add_parser("restore", parents=[common])
     restore.set_defaults(handler=command_restore)

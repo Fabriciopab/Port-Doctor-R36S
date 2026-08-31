@@ -1,6 +1,14 @@
 # Manual das funcionalidades do Port Doctor R36S
 
-Referência detalhada dos recursos, organizados por versão de introdução. Para começar, consulte o [guia de instalação](INSTALACAO.md) e a [página principal](README.md). Versão atual: **0.11.4**; canal oficial: **Fabriciopab/Port-Doctor-R36S**.
+Referência detalhada dos recursos, organizados por versão de introdução. Para começar, consulte o [guia de instalação](INSTALACAO.md) e a [página principal](README.md). Versão atual: **0.11.5**; canal oficial: **Fabriciopab/Port-Doctor-R36S**.
+
+## 0.11.5 — abertura e imagem do Hollow Knight
+
+Com o jogo fechado, abra **Meus ports → selecione Hollow Knight → Corrigir**. O reparo automático instala a correção EGL e, quando as preferências já existem, ajusta texturas/desfoque na mesma operação, com backup próprio para cada etapa. Se o EGL já está instalado e a imagem continua roxa/preta, a página oferece **Corrigir tela roxa/preta**. O reconhecimento depende dos binários e do ambiente, não apenas do nome da pasta.
+
+O ajuste usa `textureMaxDim=0` e desfoque Alto (`ShaderQuality=2`) no build validado. Personagem/cenário, áudio e controles foram confirmados pelo mantenedor no dArkOSRE. Outros pacotes e partidas prolongadas não estão certificados. Se as preferências ainda não existem, abra/feche o jogo uma vez e analise novamente.
+
+Preserva o limite de quadros escolhido pelo jogador, efeitos de dano, saves, áudio e controles. Não faz overclock, não altera proteção térmica e não promete remover a pausa de impacto. O teste de limite de 60 quadros foi descartado após piora relatada pelo mantenedor; não faz parte do aplicativo. **Desfazer último reparo** reverte uma etapa por vez, começando pelos gráficos; se as duas etapas foram aplicadas, desfaça novamente para retirar o EGL. [Passo a passo e limites](portdoctor/docs/HOLLOW-KNIGHT-EGL.md).
 
 ## 0.11.4 — reparo de vídeo do Hollow Knight
 
@@ -8,7 +16,7 @@ Em **Meus ports → Hollow Knight**, o Doctor identifica o carregador e o motor 
 
 O reparo corrige referências a uma superfície EGL que o SDL já recriou. Instala um módulo apenas na pasta desse jogo e ajusta seu launcher com backup; não substitui drivers, não altera o motor nem os saves. Verifica os hashes novamente a cada abertura. **Verificar último reparo** exige um log novo com confirmação do contexto de vídeo. **Desfazer último reparo** remove o módulo instalado e restaura o launcher.
 
-Nos testes com dArkOSRE, o ajuste passou da tela preta para a seleção de idioma. Partidas longas, áudio e todos os controles ainda dependem de validação do usuário. [Detalhes técnicos e limites](portdoctor/docs/HOLLOW-KNIGHT-EGL.md).
+Na versão 0.11.4, o primeiro teste passou da tela preta para a seleção de idioma. A versão 0.11.5 acrescenta o complemento gráfico e a confirmação posterior de imagem, áudio e controles; partidas prolongadas e outros builds continuam sem certificação. [Detalhes técnicos e limites](portdoctor/docs/HOLLOW-KNIGHT-EGL.md).
 
 ## 0.11.3 — dArkOSRE e pacotes Unity
 

@@ -302,7 +302,8 @@ function repairs.actions(details)
     local nativeCrash = findIssue(details, "native_crash")
     local availableGameData = gameDataCommand(details)
     local unityEglIssue = findIssue(details, 'unity_egl')
-    local automaticIssue = unityEglIssue or truncated or memoryIssue or audioBusyIssue or audioIssue
+    local unityGraphicsIssue = findIssue(details, 'unity_graphics')
+    local automaticIssue = unityGraphicsIssue or unityEglIssue or truncated or memoryIssue or audioBusyIssue or audioIssue
         or compressedGameArchive
         or invalidLauncherHeader
         or localRuntimeIssue
@@ -350,6 +351,14 @@ function repairs.actions(details)
     end
 
     if details and details.path and util.testFile(details.path .. '/unityloader') then
+        if unityGraphicsIssue then
+            local command = helperBase('unity-graphics',details)
+            actions[#actions+1] = {id='unity_graphics',label='Corrigir tela roxa/preta',
+                value='Hollow Knight · texturas e desfoque',
+                detail='Desativa redução de texturas e coloca desfoque Alto, com backup. Fase, áudio e controles confirmados no build testado. Preserva saves, limite de quadros e efeitos de dano. Confira sua cópia.',
+                enabled=command~=nil,command=command,requiresTest=true,
+                confirmation='Ajustar texturas e desfoque deste build? Poderá usar mais memória. Haverá backup para desfazer.'}
+        end
         if unityEglIssue then
             local command = helperBase('unity-egl',details)
             actions[#actions+1] = {id='unity_egl',label='Corrigir vídeo do Hollow Knight',
