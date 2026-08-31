@@ -1,5 +1,7 @@
 # Verificações da versão 0.11.0 — 31/08/2026
 
+Registro histórico anterior à publicação. O repositório já foi publicado; a checagem posterior do canal/download está em [TESTES-v0.11.2.md](TESTES-v0.11.2.md). Os limites físicos abaixo continuam válidos.
+
 ## Executado
 
 - 24 testes novos locais: quatro perfis, bloqueios de SoC/frequência/temperatura/

@@ -127,4 +127,4 @@ Agradecimentos às comunidades **PortMaster, dArkOSRE e ArkOS**, aos autores dos
 
 Código próprio sob [licença MIT](LICENSE), mantendo os créditos de **fabriciopab**. Integrações e componentes de terceiros conservam suas licenças. Jogos, ROMs, BIOS e arquivos proprietários **não acompanham** o projeto.
 
-[Arquitetura e testes](DEVELOPMENT.md) · [Testes físicos da 0.11.0](TESTES-v0.11.0.md) · [Créditos](AUTHORS.md)
+[Arquitetura e testes](DEVELOPMENT.md) · [Verificação da release e downloads](TESTES-v0.11.2.md) · [Testes físicos da 0.11.0](TESTES-v0.11.0.md) · [Créditos](AUTHORS.md)
