@@ -1,6 +1,14 @@
 # Manual das funcionalidades do Port Doctor R36S
 
-Referência detalhada dos recursos, organizados por versão de introdução. Para começar, consulte o [guia de instalação](INSTALACAO.md) e a [página principal](README.md). Versão atual: **0.11.3**; canal oficial: **Fabriciopab/Port-Doctor-R36S**.
+Referência detalhada dos recursos, organizados por versão de introdução. Para começar, consulte o [guia de instalação](INSTALACAO.md) e a [página principal](README.md). Versão atual: **0.11.4**; canal oficial: **Fabriciopab/Port-Doctor-R36S**.
+
+## 0.11.4 — reparo de vídeo do Hollow Knight
+
+Em **Meus ports → Hollow Knight**, o Doctor identifica o carregador e o motor por SHA-256. Quando a receita corresponde ao ambiente RK3326/Mali-G31, oferece **Corrigir** na mesma página e **Corrigir vídeo do Hollow Knight** nas ações. O módulo necessário acompanha o instalador: não exige SSH, compilação ou chmod manual.
+
+O reparo corrige referências a uma superfície EGL que o SDL já recriou. Instala um módulo apenas na pasta desse jogo e ajusta seu launcher com backup; não substitui drivers, não altera o motor nem os saves. Verifica os hashes novamente a cada abertura. **Verificar último reparo** exige um log novo com confirmação do contexto de vídeo. **Desfazer último reparo** remove o módulo instalado e restaura o launcher.
+
+Nos testes com dArkOSRE, o ajuste passou da tela preta para a seleção de idioma. Partidas longas, áudio e todos os controles ainda dependem de validação do usuário. [Detalhes técnicos e limites](portdoctor/docs/HOLLOW-KNIGHT-EGL.md).
 
 ## 0.11.3 — dArkOSRE e pacotes Unity
 
@@ -62,7 +70,7 @@ Referência de rede: [comandos oficiais do NetworkManager](https://networkmanage
 - Bateria: leitura dos sensores, consumo instantâneo estimado, brilho em passos de 10 pontos, economia opcional e restauração. O modo econômico limita o brilho a 30% e usa `conservative` somente quando o kernel oferece esse modo. Pode reduzir desempenho; vale neste boot e o firmware pode substituí-lo.
 - Ajustes de bateria têm registro anterior, confirmação de gravação e reversão em caso de falha parcial. Não alteram carregamento, tensão, limites de frequência, Wi-Fi ou USB. Porcentagem e saúde são valores do sensor, não uma avaliação do desgaste.
 - Verificação de reparos detecta também novas falhas nativas e bibliotecas diferentes que falharam depois da primeira correção. Ausência de erros produz resultado **inconclusivo**, nunca garantia de que o jogo funciona.
-- Hollow Knight: detecção de SIGBUS em registros `tombstone_*` próximos ao horário do log. O perfil gráfico leve testado não resolveu a falha e **não é distribuído como correção automática comprovada**. Saves permanecem intactos.
+- Hollow Knight: detecção de SIGBUS em registros `tombstone_*` próximos ao horário do log. O antigo perfil gráfico leve não resolveu a falha. A partir da 0.11.4, há uma receita EGL específica com validação dos binários; não é um reparo genérico de SIGBUS. Saves permanecem intactos.
 
 Referências técnicas: [interfaces de bateria do Linux](https://www.kernel.org/doc/html/latest/power/power_supply_class.html) e [Bogodroid](https://github.com/binarycounter/Bogodroid). O diagnóstico não promete corrigir todo executável incompatível ou conjunto de dados incompleto.
 

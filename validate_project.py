@@ -15,8 +15,8 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parent
 OUTPUTS = Path(os.environ.get('PORTDOCTOR_OUTPUTS', ROOT.parents[1] / "outputs")).resolve()
-INSTALLABLE = OUTPUTS / "Port-Doctor-R36S-v0.11.3.zip"
-EASY_INSTALLER = OUTPUTS / "Port-Doctor-R36S-Instalador-v0.11.3.zip"
+INSTALLABLE = OUTPUTS / "Port-Doctor-R36S-v0.11.4.zip"
+EASY_INSTALLER = OUTPUTS / "Port-Doctor-R36S-Instalador-v0.11.4.zip"
 
 
 def require(condition: bool, message: str):
@@ -434,8 +434,9 @@ def main():
     subprocess.run([sys.executable, str(ROOT / 'test_v0100.py')], check=True)
     subprocess.run([sys.executable, str(ROOT / 'test_v0110.py')], check=True)
     subprocess.run([sys.executable, str(ROOT / 'test_unity_audit.py')], check=True)
+    subprocess.run([sys.executable, str(ROOT / 'test_unity_egl.py')], check=True)
     release = json.loads((ROOT / 'portdoctor/release.json').read_text())
-    require(release['version'] == '0.11.3', 'versão interna não confere')
+    require(release['version'] == '0.11.4', 'versão interna não confere')
     require(release['pix'] == 'fabriciopab@hotmail.com', 'chave Pix divergente')
     require(release['github_owner'] == 'Fabriciopab' and release['github_repository'] == 'Port-Doctor-R36S',
             'canal oficial de atualização divergente')

@@ -1,5 +1,13 @@
 # Histórico de versões
 
+## 0.11.4
+
+- Receita protegida para o carregador Hollow Knight AArch64 que conserva uma superfície EGL destruída pelo SDL/KMSDRM; identificada no RK3326/dArkOSRE.
+- Módulo local com fonte MIT, sem código ou dados proprietários; incluído no instalador, sem necessidade de compilação ou SSH no console.
+- Identificação por SHA-256, confirmação na página do port, backup, verificação de gravação e restauração do launcher.
+- Verificação posterior usa o log do jogo, exige evidência de contexto ativo e continua sem declarar gameplay apenas pela ausência de crash.
+- Testes de ciclo de superfícies, recusa de builds desconhecidos, gravação, rollback e preservação de saves.
+
 ## 0.11.3 — dArkOSRE e verificação de pacotes Unity
 
 - Firmware de testes dArkOSRE destacado na interface, no Sobre, nos metadados e na documentação.

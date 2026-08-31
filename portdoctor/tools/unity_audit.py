@@ -146,7 +146,7 @@ def main() -> int:
             if manifest[category]:
                 print(category + ': ' + json.dumps(manifest[category][:30], ensure_ascii=False))
         print('\n' + result['notice'])
-        print('Nenhum arquivo, save ou biblioteca foi alterado. Não há reparo de SIGBUS comprovado para o build de Hollow Knight investigado no dArkOSRE.')
+        print('Nenhum arquivo, save ou biblioteca foi alterado. O Doctor oferece separadamente uma receita EGL para um build específico de Hollow Knight no RK3326/dArkOSRE; outros SIGBUS continuam exigindo diagnóstico.')
         print('Se houver diferenças, confira a cópia legítima dos arquivos e as versões exigidas pelo autor do port; não substitua libunity.so isoladamente.')
     return 1 if result['manifest']['status'] == 'mismatch' else 0
 

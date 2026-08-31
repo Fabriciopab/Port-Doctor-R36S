@@ -301,7 +301,8 @@ function repairs.actions(details)
     local wrongNativeArchitectureIssue = findIssue(details, "wrong_native_architecture")
     local nativeCrash = findIssue(details, "native_crash")
     local availableGameData = gameDataCommand(details)
-    local automaticIssue = truncated or memoryIssue or audioBusyIssue or audioIssue
+    local unityEglIssue = findIssue(details, 'unity_egl')
+    local automaticIssue = unityEglIssue or truncated or memoryIssue or audioBusyIssue or audioIssue
         or compressedGameArchive
         or invalidLauncherHeader
         or localRuntimeIssue
@@ -349,6 +350,14 @@ function repairs.actions(details)
     end
 
     if details and details.path and util.testFile(details.path .. '/unityloader') then
+        if unityEglIssue then
+            local command = helperBase('unity-egl',details)
+            actions[#actions+1] = {id='unity_egl',label='Corrigir vídeo do Hollow Knight',
+                value='superfície EGL · build verificado',
+                detail='Instala um módulo local e guarda backup do launcher. Não modifica motor, bibliotecas do sistema ou saves. Depois, teste imagem, controles e áudio.',
+                enabled=command~=nil,command=command,requiresTest=true,
+                confirmation='Aplicar o reparo de vídeo neste build verificado? Você poderá desfazer a alteração.'}
+        end
         local auditHelper = (os.getenv('PORTDOCTOR_HOME') or '') .. '/tools/unity_audit.py'
         local available = util.testFile(auditHelper)
         actions[#actions+1] = {id='unity_audit',label='Verificar pacote Unity',

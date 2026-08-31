@@ -499,6 +499,28 @@ function diagnostics.analyzePort(name, root)
             "O port ainda pode não ter sido iniciado ou grava logs em outro local.")
     end
 
+    local unityEglState
+    local unityHelper = (os.getenv('PORTDOCTOR_HOME') or '') .. '/tools/unity_egl.py'
+    if util.testFile(path .. '/unityloader') and util.testFile(unityHelper) then
+        local firstLauncher = util.firstLine(launcherText)
+        local command = 'python3 ' .. util.shellQuote(unityHelper) .. ' --port-home ' .. quoted
+        if firstLauncher and firstLauncher ~= '' then
+            command = command .. ' --launcher ' .. util.shellQuote(firstLauncher)
+        end
+        unityEglState = util.firstLine(commandValue(command .. ' 2>/dev/null', 'unsupported'))
+        if unityEglState == 'available' then
+            issues = logdoctor.append(issues, {id='unity_egl',kind='unity_egl',severity='warn',priority=130,
+                label='Correção de vídeo Unity disponível',value='build com superfície EGL obsoleta',
+                detail='Este carregador foi identificado por SHA-256. Há um ajuste local de vídeo testado no RK3326/dArkOSRE; o launcher terá backup e os saves serão preservados.',
+                evidence='Binários e ambiente correspondem à receita validada.',repairable=true})
+            results[#results+1] = item('port_unity_egl','port','Corrigir vídeo do Hollow Knight','warn',
+                'reparo específico disponível','Selecione Corrigir neste port. Não instala drivers nem altera o motor do jogo.')
+        elseif unityEglState == 'applied' then
+            results[#results+1] = item('port_unity_egl','port','Reparo de vídeo Unity','info',
+                'instalado; teste o jogo','A presença do módulo não confirma gameplay, áudio ou ausência de outras falhas.')
+        end
+    end
+
     local launchers = launcherText
     results[#results + 1] = item("port_launcher", "port", "Launcher relacionado",
         launchers ~= "" and "ok" or "info", launchers ~= "" and util.firstLine(launchers) or "não associado automaticamente",
@@ -521,6 +543,7 @@ function diagnostics.analyzePort(name, root)
         metadataText = metadataText,
         logPath = logPath,
         recipe = recipe,
+        unityEglState = unityEglState,
     }
 end
 
@@ -545,7 +568,7 @@ function diagnostics.exportReport(systemResults, portResults, selectedPort)
     local stamp = os.date("%Y%m%d-%H%M%S")
     local path = reportDir .. "/portdoctor-" .. stamp .. ".txt"
     local lines = {
-        "Port Doctor R36S 0.11.3",
+        "Port Doctor R36S 0.11.4",
         "Autor: fabriciopab · https://github.com/Fabriciopab",
         "Gerado em: " .. os.date("%Y-%m-%d %H:%M:%S"),
         "Modo: somente leitura",

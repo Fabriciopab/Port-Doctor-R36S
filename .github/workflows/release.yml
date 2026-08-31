@@ -46,6 +46,8 @@ jobs:
           sudo apt-get install -y python3-pil lua5.1
       - name: Montar e validar pacotes
         run: |
+          gcc -O2 -Wall -Wextra -Werror -pthread portdoctor/native/test_unity_egl.c -o "$RUNNER_TEMP/test-unity-egl"
+          "$RUNNER_TEMP/test-unity-egl"
           python3 build_package.py
           python3 validate_project.py
           lua5.1 test_ui.lua

@@ -97,8 +97,8 @@ def newest_log(port_home: Path, launcher: Path) -> Path | None:
     return max(unique.values(), key=lambda path: path.stat().st_mtime_ns, default=None)
 
 
-def log_snapshot(port_home: Path, launcher: Path) -> dict | None:
-    path = newest_log(port_home, launcher)
+def log_snapshot(port_home: Path, launcher: Path, path: Path | None = None) -> dict | None:
+    path = path or newest_log(port_home, launcher)
     if path is None:
         return None
     try:
@@ -1384,6 +1384,14 @@ def loader_preflight(executable: Path, port_home: Path, architecture: str) -> tu
     return clean, output
 
 
+def command_unity_egl(args: argparse.Namespace) -> None:
+    import unity_egl
+    try:
+        unity_egl.apply(args)
+    except (OSError, ValueError, subprocess.SubprocessError) as error:
+        fail(str(error))
+
+
 def command_auto_repair(args: argparse.Namespace) -> None:
     launcher = Path(args.launcher).resolve()
     port_home = Path(args.port_home).resolve()
@@ -1491,8 +1499,15 @@ def command_auto_repair(args: argparse.Namespace) -> None:
     common = argparse.Namespace(
         launcher=str(launcher), port_home=str(port_home), doctor_home=str(doctor_home)
     )
-    # A lighter Unity profile did NOT resolve the reported Hollow Knight crash.
-    # Do not offer it as an automatic fix without a validated cause/recipe.
+    # This exact loader caches a destroyed SDL/KMSDRM EGLSurface. Never apply
+    # the recipe to a different build or guess from the game's folder name.
+    if (port_home / 'unityloader').is_file():
+        import unity_egl
+        state, _ = unity_egl.check(port_home, launcher)
+        if state == 'available':
+            print('Port Doctor: plano automático: corrigir superfície EGL do build Unity validado.')
+            command_unity_egl(common)
+            return
     if "game.droid is compressed" in lowered or "bitstream/page/packet is not vorbis data" in lowered:
         print("Port Doctor: plano automático: reconstruir o pacote GMLoader para acesso direto aos recursos.")
         command_repack_game_archive(common)
@@ -1568,11 +1583,11 @@ def command_verify(args: argparse.Namespace) -> None:
             continue
         if manifest.get("restored") or Path(manifest.get("launcher_path", "")).resolve() != launcher:
             continue
-        current = log_snapshot(port_home, launcher)
+        action = manifest.get("action", "")
+        current = log_snapshot(port_home, launcher, port_home / 'log.txt' if action == 'unity-egl' else None)
         previous = manifest.get("log_before")
         if current is None:
             fail("nenhum log do port foi encontrado; abra o jogo uma vez e tente novamente")
-        action = manifest.get("action", "")
         same_content = previous and current.get("sha256") == previous.get("sha256")
         same_timestamp = previous and current.get("mtime_ns") == previous.get("mtime_ns")
         if same_content and same_timestamp:
@@ -1585,6 +1600,12 @@ def command_verify(args: argparse.Namespace) -> None:
         except OSError:
             fail("não foi possível ler o novo log")
         failures: list[str] = []
+        if action == 'unity-egl':
+            import unity_egl
+            if 'superfície EGL atualizada; contexto de vídeo ativo.' not in data:
+                failures.append('o novo log não confirmou a ativação da superfície EGL corrigida')
+            if unity_egl.check(port_home, launcher)[0] != 'applied':
+                failures.append('o módulo ou o build mudou depois do reparo')
         if re.search(r'Segmentation fault|Bus error|SIGBUS|SIGSEGV|SIGILL|SIGABRT|Illegal instruction|'
                      r'FATAL UNHANDLED EXCEPTION|error while loading shared libraries|'
                      r'symbol lookup error|Invalid or corrupt jarfile|OpenAudioDevice failed|'
@@ -1764,6 +1785,9 @@ def parser() -> argparse.ArgumentParser:
 
     native = sub.add_parser('inspect-native', parents=[common])
     native.set_defaults(handler=command_inspect_native)
+
+    unity = sub.add_parser('unity-egl', parents=[common])
+    unity.set_defaults(handler=command_unity_egl)
 
     restore = sub.add_parser("restore", parents=[common])
     restore.set_defaults(handler=command_restore)

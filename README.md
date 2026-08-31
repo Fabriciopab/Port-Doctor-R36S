@@ -12,11 +12,11 @@ Criado por **fabriciopab**, para ajudar a comunidade a entender por que um port 
 
 **Sistema operacional usado nos testes: dArkOSRE (base Debian 13).** Esse aviso também aparece na tela inicial do aplicativo e em **Modelo e sistema testados**. dArkOSRE é a referência destes testes; não deve ser confundido com uma validação de todos os outros firmwares chamados dArkOS/ArkOS.
 
-**Novo na 0.11.3:** verificação de pacotes Unity na própria tela do port, sem alterar saves. O Hollow Knight investigado ainda **não tem reparo validado**: as bibliotecas carregam e os arquivos conferem com o manifesto, mas há uma falha nativa de memória. Veja [o que foi testado e os limites](TESTES-v0.11.3.md).
+**Novo na 0.11.4:** reparo específico da tela preta do Hollow Knight para o carregador AArch64 identificado nos testes com RK3326/dArkOSRE. O ajuste corrigiu a superfície EGL obsoleta e permitiu capturar a tela de seleção de idioma. O Doctor identifica o build por SHA-256 e oferece a correção na própria página do jogo, com backup. **Não é uma correção universal nem uma certificação de gameplay prolongado.** Veja [diagnóstico, testes e limites](portdoctor/docs/HOLLOW-KNIGHT-EGL.md).
 
 ## Instalação rápida — sem SSH e sem chmod
 
-1. Abra [Releases / Downloads](https://github.com/Fabriciopab/Port-Doctor-R36S/releases/latest) e baixe **`Port-Doctor-R36S-Instalador-v0.11.3.zip`** ou o instalador da versão mais recente.
+1. Abra [Releases / Downloads](https://github.com/Fabriciopab/Port-Doctor-R36S/releases/latest) e baixe **`Port-Doctor-R36S-Instalador-v0.11.4.zip`** ou o instalador da versão mais recente.
 2. Extraia o ZIP no computador. Copie a pasta inteira **`Port Doctor R36S Installer`** para **`tools`** no cartão de jogos. No console, ela corresponde a `/roms/tools` ou `/roms2/tools`.
 3. Coloque o cartão novamente no R36S, abra **Tools / Ferramentas** e execute **Instalar Port Doctor R36S**. Se o menu mostrar a pasta do instalador, entre nela primeiro.
 4. Aguarde a conclusão sem desligar. O instalador organiza os arquivos, preserva a instalação anterior e aplica as permissões automaticamente.
@@ -74,7 +74,7 @@ O [manual completo](FUNCIONALIDADES.md) detalha recursos, procedimentos, control
 5. Abra o jogo novamente. Teste imagem, som, controles e carregamento de save.
 6. Volte à página do jogo no Doctor e escolha a verificação do último reparo. Se necessário, use a restauração disponível.
 
-**Não existe correção universal.** O Doctor não baixa jogos/dados proprietários, não inventa arquivos ausentes e não transforma um executável incompatível em compatível apenas instalando bibliotecas. Um diagnóstico sem erro novo pode ser inconclusivo: não prova que o jogo abriu. A falha nativa observada em Hollow Knight, por exemplo, não tem correção automática comprovada nesta versão.
+**Não existe correção universal.** O Doctor não baixa jogos/dados proprietários, não inventa arquivos ausentes e não transforma um executável incompatível em compatível apenas instalando bibliotecas. Um diagnóstico sem erro novo pode ser inconclusivo: não prova que o jogo abriu. A receita EGL do Hollow Knight só é liberada para os binários e o ambiente reconhecidos; outras falhas SIGBUS/SIGSEGV exigem diagnóstico próprio.
 
 ## Atualizações pelo GitHub
 
