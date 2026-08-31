@@ -12,7 +12,7 @@ Criado por **fabriciopab**, para ajudar a comunidade a entender por que um port 
 
 ## Instalação rápida — sem SSH e sem chmod
 
-1. Abra [Releases / Downloads](https://github.com/Fabriciopab/Port-Doctor-R36S/releases/latest) e baixe **`Port-Doctor-R36S-Instalador-v0.11.1.zip`** ou o instalador da versão mais recente.
+1. Abra [Releases / Downloads](https://github.com/Fabriciopab/Port-Doctor-R36S/releases/latest) e baixe **`Port-Doctor-R36S-Instalador-v0.11.2.zip`** ou o instalador da versão mais recente.
 2. Extraia o ZIP no computador. Copie a pasta inteira **`Port Doctor R36S Installer`** para **`tools`** no cartão de jogos. No console, ela corresponde a `/roms/tools` ou `/roms2/tools`.
 3. Coloque o cartão novamente no R36S, abra **Tools / Ferramentas** e execute **Instalar Port Doctor R36S**. Se o menu mostrar a pasta do instalador, entre nela primeiro.
 4. Aguarde a conclusão sem desligar. O instalador organiza os arquivos, preserva a instalação anterior e aplica as permissões automaticamente.

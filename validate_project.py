@@ -1,4 +1,5 @@
 import json
+import importlib.util
 import hashlib
 import os
 import shutil
@@ -14,8 +15,8 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parent
 OUTPUTS = Path(os.environ.get('PORTDOCTOR_OUTPUTS', ROOT.parents[1] / "outputs")).resolve()
-INSTALLABLE = OUTPUTS / "Port-Doctor-R36S-v0.11.1.zip"
-EASY_INSTALLER = OUTPUTS / "Port-Doctor-R36S-Instalador-v0.11.1.zip"
+INSTALLABLE = OUTPUTS / "Port-Doctor-R36S-v0.11.2.zip"
+EASY_INSTALLER = OUTPUTS / "Port-Doctor-R36S-Instalador-v0.11.2.zip"
 
 
 def require(condition: bool, message: str):
@@ -433,7 +434,7 @@ def main():
     subprocess.run([sys.executable, str(ROOT / 'test_v0100.py')], check=True)
     subprocess.run([sys.executable, str(ROOT / 'test_v0110.py')], check=True)
     release = json.loads((ROOT / 'portdoctor/release.json').read_text())
-    require(release['version'] == '0.11.1', 'versão interna não confere')
+    require(release['version'] == '0.11.2', 'versão interna não confere')
     require(release['pix'] == 'fabriciopab@hotmail.com', 'chave Pix divergente')
     require(release['github_owner'] == 'Fabriciopab' and release['github_repository'] == 'Port-Doctor-R36S',
             'canal oficial de atualização divergente')
@@ -442,8 +443,15 @@ def main():
             (ROOT / 'portdoctor/tools/update-install.sh').read_bytes(), 'instalador local do atualizador divergente')
 
     require(INSTALLABLE.is_file(), "execute build_package.py antes da validação")
+    updater_spec = importlib.util.spec_from_file_location('release_validator', ROOT / 'portdoctor/tools/updater.py')
+    updater_module = importlib.util.module_from_spec(updater_spec)
+    updater_spec.loader.exec_module(updater_module)
+    require(updater_module.validate_zip(INSTALLABLE, release['version']) > 0,
+            'pacote real precisa ser aceito pelo atualizador protocol 1')
     with ZipFile(INSTALLABLE) as archive:
         names = set(archive.namelist())
+        require('portdoctor/docs/INSTALACAO.md' in names and 'INSTALACAO.md' not in names,
+                'manual deve ficar dentro do app para compatibilidade com atualizadores antigos')
         required = {
             "Port Doctor R36S.sh",
             "port.json",

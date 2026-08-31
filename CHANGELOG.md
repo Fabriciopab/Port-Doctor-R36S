@@ -1,5 +1,11 @@
 # Histórico de versões
 
+## 0.11.2 — pacote compatível com o atualizador
+
+- Documentação extra instalada em `portdoctor/docs/`, mantendo a lista de arquivos permitidos na raiz pelo protocolo 1 das versões anteriores.
+- Teste de regressão valida o ZIP real com o mesmo validador do atualizador antes da publicação.
+- Mantém funcionalidades, créditos, Pix e canal oficial da 0.11.1. Prefira esta versão à 0.11.1, cujo pacote direto era recusado pelo atualizador.
+
 ## 0.11.1 — publicação comunitária e canal oficial
 
 - Canal de atualização configurado para Fabriciopab/Port-Doctor-R36S.

@@ -1,6 +1,6 @@
 # Manual das funcionalidades do Port Doctor R36S
 
-Referência detalhada dos recursos, organizados por versão de introdução. Para começar, consulte o [guia de instalação](INSTALACAO.md) e a [página principal](README.md). Versão atual: **0.11.1**; canal oficial: **Fabriciopab/Port-Doctor-R36S**.
+Referência detalhada dos recursos, organizados por versão de introdução. Para começar, consulte o [guia de instalação](INSTALACAO.md) e a [página principal](README.md). Versão atual: **0.11.2**; canal oficial: **Fabriciopab/Port-Doctor-R36S**.
 
 Utilitário comunitário de diagnóstico e manutenção protegida para handhelds Linux compatíveis com PortMaster, criado por **fabriciopab**.
 

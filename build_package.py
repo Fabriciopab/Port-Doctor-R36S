@@ -7,7 +7,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 ROOT = Path(__file__).resolve().parent
 OUTPUTS = Path(os.environ.get('PORTDOCTOR_OUTPUTS', ROOT.parents[1] / "outputs")).resolve()
-VERSION = "0.11.1"
+VERSION = "0.11.2"
 
 
 def publishable(source):
@@ -18,13 +18,13 @@ def publishable(source):
                 or source.suffix.lower() in ('.conf', '.log', '.pyc') or source.name in ('credentials', 'update-channel.json'))
 
 
-def add_file(archive: ZipFile, source: Path, arcname: str):
+def add_file(archive: ZipFile, source: Path, arcname: str, content=None):
     info = ZipInfo.from_file(source, arcname)
     info.compress_type = ZIP_DEFLATED
     executable_names = {"r36s-usb-control", "r36s-usb-gadget"}
     mode = 0o755 if source.suffix == ".sh" or source.name in executable_names else 0o644
     info.external_attr = (0o100000 | mode) << 16
-    archive.writestr(info, source.read_bytes())
+    archive.writestr(info, source.read_bytes() if content is None else content)
 
 
 def build_installable():
@@ -34,23 +34,29 @@ def build_installable():
         ROOT / "port.json",
         ROOT / "gameinfo.xml",
         ROOT / "README.md",
-        ROOT / "INSTALACAO.md",
-        ROOT / "FUNCIONALIDADES.md",
-        ROOT / "SEGURANCA-DESEMPENHO.md",
-        ROOT / "PUBLICAR-ATUALIZACOES.md",
-        ROOT / "CONTRIBUTING.md",
-        ROOT / "DEVELOPMENT.md",
-        ROOT / "AUTHORS.md",
-        ROOT / "CHANGELOG.md",
-        ROOT / "TESTES-v0.11.0.md",
-        ROOT / "LICENSE",
         ROOT / "screenshot.png",
         ROOT / "cover.png",
     ]
 
+    documents = sorted(ROOT.glob('*.md')) + [ROOT / 'LICENSE']
     with ZipFile(destination, "w") as archive:
         for source in roots:
-            add_file(archive, source, source.name)
+            content = None
+            if source.name == 'README.md':
+                content = source.read_text(encoding='utf-8')
+                for doc in documents:
+                    content = content.replace('](' + doc.name + ')', '](portdoctor/docs/' + doc.name + ')')
+                content = content.encode('utf-8')
+            add_file(archive, source, source.name, content)
+
+        # Protocol 1 updaters allow only the original six root files.
+        # Extra manuals live inside the application, not beside launchers.
+        for doc in documents:
+            content = None
+            if doc.name == 'README.md':
+                content = doc.read_text(encoding='utf-8').replace('src="cover.png"', 'src="../../cover.png"')
+                content = content.replace('src="screenshot.png"', 'src="../../screenshot.png"').encode('utf-8')
+            add_file(archive, doc, 'portdoctor/docs/' + doc.name, content)
 
         # Keep the catalogue artwork at the archive root and also place it
         # where a direct /roms/ports extraction lets EmulationStation find it.
