@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gameList>
+  <game>
+    <path>./Port Doctor R36S.sh</path>
+    <name>Port Doctor R36S</name>
+    <desc>Port Doctor R36S por fabriciopab: diagnóstico e reparos assistidos, bibliotecas/runtimes, capas, arquivos e lixeira, USB/OTG, jogos em rede, Wi-Fi, bateria, zram e atualizações. Atestado no R36S-V30-2025-11-18-2603 com dArkOSRE. Pix voluntário: fabriciopab@hotmail.com. Contato: fabricio@byteforce-ai.com.</desc>
+    <releasedate>20260828T000000</releasedate>
+    <developer>fabriciopab</developer>
+    <publisher>fabriciopab</publisher>
+    <genre>Utility</genre>
+    <image>./portdoctor/cover.png</image>
+  </game>
+</gameList>

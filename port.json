@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "name": "portdoctor.zip",
+  "items": [
+    "Port Doctor R36S.sh",
+    "portdoctor"
+  ],
+  "items_opt": null,
+  "attr": {
+    "title": "Port Doctor R36S",
+    "desc": "Por fabriciopab: diagnóstico e reparos assistidos de ports, bibliotecas/runtimes, capas, arquivos/lixeira, rede, USB/OTG, bateria, zram e atualização pelo GitHub. Atestado no R36S-V30-2025-11-18-2603 com dArkOSRE; experimental em outras imagens.",
+    "inst": "Baixe o instalador oficial, extraia a pasta em tools e abra Instalar Port Doctor R36S pelo menu Tools. Depois abra em Ports. No dArkOSRE testado não requer SSH ou chmod; runtime LÖVE pode exigir internet.",
+    "genres": [
+      "other"
+    ],
+    "porter": [
+      "fabriciopab"
+    ],
+    "image": {},
+    "rtr": true,
+    "exp": true,
+    "runtime": "love_11.5",
+    "reqs": [],
+    "arch": []
+  }
+}

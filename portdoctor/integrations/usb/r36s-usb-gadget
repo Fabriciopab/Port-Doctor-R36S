@@ -1,0 +1,170 @@
+#!/bin/bash
+set -u
+
+CONF="/etc/r36s-usb-file-access.conf"
+[ -r "$CONF" ] || exit 0
+# shellcheck disable=SC1090
+. "$CONF"
+
+G="/sys/kernel/config/usb_gadget/r36s_usb"
+PIDFILE="/run/r36s-usb-dnsmasq.pid"
+LEASEFILE="/run/r36s-usb-dnsmasq.leases"
+SAMBA_RUN="/run/r36s-usb-samba"
+SAMBA_CONF="/etc/samba/r36s-usb.conf"
+
+log() {
+    logger -t r36s-usb-gadget "$1"
+    echo "$1"
+}
+
+live_mode() {
+    tr -d '\000' <"/proc/device-tree${USB_NODE}/dr_mode" 2>/dev/null || true
+}
+
+stop_services() {
+    if [ -f "$PIDFILE" ]; then
+        PID="$(cat "$PIDFILE" 2>/dev/null || true)"
+        [ -n "$PID" ] && kill "$PID" 2>/dev/null || true
+        rm -f "$PIDFILE"
+    fi
+    if [ -f "$SAMBA_RUN/smbd.pid" ]; then
+        PID="$(cat "$SAMBA_RUN/smbd.pid" 2>/dev/null || true)"
+        [ -n "$PID" ] && kill "$PID" 2>/dev/null || true
+    fi
+}
+
+unbind_gadget() {
+    [ -d "$G" ] || return 0
+    [ -e "$G/UDC" ] && printf '' > "$G/UDC" 2>/dev/null || true
+    rm -f "$G/os_desc/c.1" 2>/dev/null || true
+    rm -f "$G/configs/c.1/rndis.usb0" 2>/dev/null || true
+    rmdir "$G/configs/c.1/strings/0x409" 2>/dev/null || true
+    rmdir "$G/configs/c.1" 2>/dev/null || true
+    rmdir "$G/functions/rndis.usb0" 2>/dev/null || true
+    rmdir "$G/strings/0x409" 2>/dev/null || true
+    rmdir "$G" 2>/dev/null || true
+}
+
+stop_all() {
+    stop_services
+    ip link set usb0 down 2>/dev/null || true
+    unbind_gadget
+}
+
+start_all() {
+    MODE="$(live_mode)"
+    if [ "$MODE" != "peripheral" ]; then
+        log "Modo atual: ${MODE:-desconhecido}. Gadget USB não iniciado."
+        exit 0
+    fi
+
+    stop_all
+    modprobe -r g_ether 2>/dev/null || true
+    modprobe libcomposite
+    modprobe usb_f_rndis
+
+    mountpoint -q /sys/kernel/config || mount -t configfs none /sys/kernel/config
+    mkdir -p "$G"
+    cd "$G"
+
+    echo 0x1d6b > idVendor
+    echo 0x0104 > idProduct
+    echo 0x0200 > bcdUSB
+    echo 0x0100 > bcdDevice
+
+    mkdir -p strings/0x409
+    echo "R36S-USB-001" > strings/0x409/serialnumber
+    echo "Byte Force Tecnologias" > strings/0x409/manufacturer
+    echo "R36S USB File Access" > strings/0x409/product
+
+    mkdir -p configs/c.1/strings/0x409
+    echo "R36S RNDIS Network" > configs/c.1/strings/0x409/configuration
+    echo 250 > configs/c.1/MaxPower
+
+    mkdir -p functions/rndis.usb0
+    echo "02:36:00:00:00:01" > functions/rndis.usb0/dev_addr
+    echo "02:36:00:00:00:02" > functions/rndis.usb0/host_addr
+    ln -s functions/rndis.usb0 configs/c.1/rndis.usb0
+
+    echo 1 > os_desc/use
+    echo 0xcd > os_desc/b_vendor_code
+    echo "MSFT100" > os_desc/qw_sign
+    ln -s configs/c.1 os_desc/c.1
+    echo "$UDC" > UDC
+
+    COUNT=0
+    while ! ip link show usb0 >/dev/null 2>&1; do
+        COUNT=$((COUNT + 1))
+        [ "$COUNT" -ge 20 ] && { log "Interface usb0 não apareceu."; exit 1; }
+        sleep 1
+    done
+
+    ip address flush dev usb0
+    ip address add 192.168.7.1/24 dev usb0
+    ip link set usb0 up
+    systemctl start ssh 2>/dev/null || systemctl start sshd 2>/dev/null || true
+
+    dnsmasq --conf-file=/dev/null --interface=usb0 --bind-interfaces \
+        --except-interface=lo --port=0 --dhcp-authoritative \
+        --dhcp-range=192.168.7.2,192.168.7.20,255.255.255.0,12h \
+        --dhcp-option=3 --dhcp-option=6 \
+        --pid-file="$PIDFILE" --dhcp-leasefile="$LEASEFILE"
+
+    if command -v smbd >/dev/null 2>&1; then
+        # O smbd iniciado fora do serviço Samba padrão precisa destes
+        # diretórios voláteis, que desaparecem a cada reinicialização.
+        install -d -m 0755 /run/samba /run/samba/ncalrpc
+        install -d -m 0755 "$SAMBA_RUN" /etc/samba
+        cat > "$SAMBA_CONF" <<'EOF'
+[global]
+   workgroup = WORKGROUP
+   server string = R36S USB
+   server role = standalone server
+   security = user
+   map to guest = Never
+   interfaces = usb0
+   bind interfaces only = yes
+   server min protocol = SMB2
+   disable spoolss = yes
+   load printers = no
+   printing = bsd
+   printcap name = /dev/null
+   log file = /run/r36s-usb-samba/log.%m
+   pid directory = /run/r36s-usb-samba
+   lock directory = /run/r36s-usb-samba
+   state directory = /run/r36s-usb-samba
+   cache directory = /run/r36s-usb-samba
+   private dir = /var/lib/samba/private
+   passdb backend = tdbsam
+
+[ROMS]
+   path = /roms
+   browseable = yes
+   read only = no
+   guest ok = no
+   valid users = ark
+   force user = ark
+   create mask = 0666
+   directory mask = 0777
+
+[ROMS2]
+   path = /roms2
+   browseable = yes
+   read only = no
+   guest ok = no
+   valid users = ark
+   force user = ark
+   create mask = 0666
+   directory mask = 0777
+EOF
+        smbd -D -s "$SAMBA_CONF" || log "Samba não iniciou; SSH/SFTP continua disponível."
+    fi
+
+    log "USB ativo em 192.168.7.1; DHCP 192.168.7.2-20."
+}
+
+case "${1:-start}" in
+    start) start_all ;;
+    stop) stop_all ;;
+    *) echo "Uso: $0 start|stop"; exit 2 ;;
+esac

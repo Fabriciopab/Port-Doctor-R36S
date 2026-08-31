@@ -1,0 +1,91 @@
+name: Publicar release
+
+on:
+  push:
+    branches: [main]
+    paths: [portdoctor/release.json]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portdoctor-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.repository == 'Fabriciopab/Port-Doctor-R36S' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    env:
+      PORTDOCTOR_OUTPUTS: ${{ github.workspace }}/dist
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Ler versão estável
+        id: version
+        run: |
+          python3 - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          m = json.loads(Path('portdoctor/release.json').read_text())
+          assert re.fullmatch(r'\d+\.\d+\.\d+', m['version'])
+          assert m['github_owner'] == 'Fabriciopab'
+          assert m['github_repository'] == 'Port-Doctor-R36S'
+          assert Path('releases/v' + m['version'] + '.md').is_file()
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write('value=' + m['version'] + '\n')
+          PY
+      - name: Preparar ferramentas de teste
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pil lua5.1
+      - name: Montar e validar pacotes
+        run: |
+          python3 build_package.py
+          python3 validate_project.py
+          lua5.1 test_ui.lua
+          lua5.1 test_ui_storage.lua
+          lua5.1 test_ui_updates.lua
+      - name: Publicar somente versão inédita
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PD_VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          tag="v$PD_VERSION"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release já existe; não será sobrescrita."
+            exit 0
+          fi
+          gh release create "$tag" \
+            "dist/Port-Doctor-R36S-Instalador-$tag.zip" \
+            "dist/Port-Doctor-R36S-$tag.zip" \
+            "dist/Port-Doctor-R36S-$tag.zip.sha256" \
+            "dist/Port-Doctor-R36S-Windows-Rede-$tag.zip" \
+            "dist/portdoctor-r36s-source-$tag.zip" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Port Doctor R36S $tag" \
+            --notes-file "releases/$tag.md" \
+            --latest
+      - name: Conferir SHA-256 publicado
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PD_VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v$PD_VERSION" > "$RUNNER_TEMP/release.json"
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          r = json.loads((Path(os.environ['RUNNER_TEMP']) / 'release.json').read_text())
+          assert not r['draft'] and not r['prerelease']
+          name = 'Port-Doctor-R36S-v' + os.environ['PD_VERSION'] + '.zip'
+          assets = [a for a in r['assets'] if a['name'] == name]
+          assert len(assets) == 1 and assets[0]['state'] == 'uploaded'
+          assert assets[0].get('digest', '').startswith('sha256:')
+          print('Release pública com digest SHA-256 para o atualizador.')
+          PY

@@ -1,0 +1,31 @@
+INSTALADOR DE UM CLIQUE - PORT DOCTOR R36S
+==========================================
+
+Este instalador evita o fluxo autoinstall do PortMaster em imagens nas quais
+esse fluxo pode ficar travado.
+
+1. Extraia a pasta "Port Doctor R36S Installer" em /roms/tools ou
+   /roms2/tools.
+2. Abra o menu Tools do R36S.
+3. Execute "Instalar Port Doctor R36S".
+4. Aguarde a mensagem de conclusão.
+5. Abra "Port Doctor R36S" no menu Ports.
+
+O instalador valida o ZIP antes de alterar arquivos, guarda uma instalação
+anterior em portdoctor-install-backups e aplica as permissões automaticamente.
+Não é necessário usar SSH, terminal ou chmod.
+
+Créditos: fabriciopab
+GitHub: https://github.com/Fabriciopab
+Contato: fabricio@byteforce-ai.com
+
+Apoio voluntário ao projeto (Pix): fabriciopab@hotmail.com
+Atestado no modelo R36S-V30-2025-11-18-2603, com dArkOSRE.
+Outras revisões/firmwares podem se comportar de forma diferente.
+
+A função Atualizar Port Doctor já vem configurada para o canal oficial:
+https://github.com/Fabriciopab/Port-Doctor-R36S
+No app, escolha Atualizar Port Doctor > Verificar atualizações.
+Downloads: https://github.com/Fabriciopab/Port-Doctor-R36S/releases/latest
+Guia: https://github.com/Fabriciopab/Port-Doctor-R36S/blob/main/INSTALACAO.md
+Não extraia o portdoctor.zip interno nem separe os arquivos do instalador.

@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.log
+*.conf
+credentials
+portdoctor/log.txt
+portdoctor/conf/
+dist/
+outputs/
+.portdoctor-*/

@@ -1,0 +1,112 @@
+#!/bin/bash
+set -eu
+
+CONF="/etc/r36s-usb-file-access.conf"
+TTY="/dev/tty1"
+
+notify_box() {
+    TITLE="$1"
+    MESSAGE="$2"
+    SECONDS="${3:-6}"
+    if command -v dialog >/dev/null 2>&1 && [ -w "$TTY" ]; then
+        dialog --clear --title "$TITLE" --infobox "$MESSAGE" 15 68 <"$TTY" >"$TTY" 2>&1 || true
+        sleep "$SECONDS"
+    else
+        printf '%b\n' "$MESSAGE"
+    fi
+}
+
+fail() {
+    notify_box "R36S USB - Erro" "$1\n\nNada foi alterado." 7
+    exit 1
+}
+
+[ -r "$CONF" ] || fail "Sistema ainda não instalado. Execute 'Instalar R36S USB'."
+# shellcheck disable=SC1090
+. "$CONF"
+
+hash_of() { sha256sum "$1" | awk '{print $1}'; }
+mode_of() { fdtget -t s "$1" "$USB_NODE" dr_mode 2>/dev/null || true; }
+
+validate_files() {
+    [ -f "$ACTIVE_DTB" ] || fail "DTB ativo não encontrado: $ACTIVE_DTB"
+    [ -f "$ORIGINAL_DTB" ] || fail "Backup original não encontrado."
+    [ -f "$PERIPHERAL_DTB" ] || fail "DTB peripheral não encontrado."
+    [ "$(hash_of "$ORIGINAL_DTB")" = "$ORIGINAL_SHA" ] || fail "Backup original não passou na verificação SHA-256."
+    [ "$(hash_of "$PERIPHERAL_DTB")" = "$PERIPHERAL_SHA" ] || fail "DTB peripheral não passou na verificação SHA-256."
+    [ "$(mode_of "$ORIGINAL_DTB")" = "otg" ] || fail "Backup original não está em modo OTG."
+    [ "$(mode_of "$PERIPHERAL_DTB")" = "peripheral" ] || fail "DTB USB não está em modo peripheral."
+}
+
+install_dtb() {
+    SOURCE="$1"
+    EXPECTED="$2"
+    TEMP="${ACTIVE_DTB}.r36s-usb.tmp"
+    cp "$SOURCE" "$TEMP"
+    sync
+    [ "$(hash_of "$TEMP")" = "$EXPECTED" ] || { rm -f "$TEMP"; fail "A cópia temporária falhou na validação."; }
+    mv -f "$TEMP" "$ACTIVE_DTB"
+    sync
+    [ "$(hash_of "$ACTIVE_DTB")" = "$EXPECTED" ] || fail "O DTB ativo não passou na verificação final."
+}
+
+activate() {
+    validate_files
+    CURRENT="$(hash_of "$ACTIVE_DTB")"
+    case "$CURRENT" in
+        "$ORIGINAL_SHA"|"$PERIPHERAL_SHA"|"${INSTALL_ACTIVE_SHA:-}") ;;
+        *) fail "O DTB ativo mudou desde a instalação. Reinstale para gerar backups novos." ;;
+    esac
+    install_dtb "$PERIPHERAL_DTB" "$PERIPHERAL_SHA"
+    notify_box "Ativar USB por Cabo" "MODO USB PREPARADO\n\nO aparelho será reiniciado.\nConecte o cabo de dados na porta OTG.\n\nIP do R36S: 192.168.7.1\nPasta: \\\\192.168.7.1\\ROMS\n\nNeste modo, o dongle Wi-Fi não funciona." 9
+    reboot
+}
+
+restore() {
+    validate_files
+    CURRENT="$(hash_of "$ACTIVE_DTB")"
+    case "$CURRENT" in
+        "$ORIGINAL_SHA"|"$PERIPHERAL_SHA"|"${INSTALL_ACTIVE_SHA:-}") ;;
+        *) fail "O DTB ativo mudou desde a instalação. Restauração automática cancelada." ;;
+    esac
+    install_dtb "$ORIGINAL_DTB" "$ORIGINAL_SHA"
+    systemctl disable r36s-usb-gadget.service >/dev/null 2>&1 || true
+    systemctl enable r36s-usb-gadget.service >/dev/null 2>&1 || true
+    notify_box "Restaurar USB e WiFi" "MODO OTG NORMAL RESTAURADO\n\nO aparelho será reiniciado.\nDepois conecte o dongle Wi-Fi na porta OTG.\nSe necessário, use a ferramenta Wi-Fi Toggle do dArkOSRE." 7
+    reboot
+}
+
+status_cmd() {
+    FILE_MODE="$(mode_of "$ACTIVE_DTB")"
+    LIVE_MODE="$(tr -d '\000' <"/proc/device-tree${USB_NODE}/dr_mode" 2>/dev/null || true)"
+    UDC_STATE="$(cat "/sys/class/udc/$UDC/state" 2>/dev/null || echo indisponível)"
+    USB_IP="$(ip -4 -brief address show usb0 2>/dev/null || echo 'usb0 não disponível')"
+    SERVICE="$(systemctl is-active r36s-usb-gadget.service 2>/dev/null || true)"
+    notify_box "Status R36S USB" "DTB instalado: ${FILE_MODE:-desconhecido}\nModo deste boot: ${LIVE_MODE:-desconhecido}\nServiço: ${SERVICE:-inativo}\nUDC: $UDC_STATE\n$USB_IP\n\nUSB: \\\\192.168.7.1\\ROMS\nSSH: ark@192.168.7.1" 12
+}
+
+uninstall_info() {
+    notify_box "Desinstalar R36S USB" "Por segurança, a desinstalação exige SSH.\n\nPrimeiro use 'Restaurar USB e WiFi'.\nDepois execute pelo SSH:\n\nsudo r36s-usb-control uninstall --confirm\n\nOs backups do DTB serão preservados." 12
+}
+
+uninstall() {
+    [ "${2:-}" = "--confirm" ] || { echo "Use: sudo r36s-usb-control uninstall --confirm"; exit 2; }
+    validate_files
+    install_dtb "$ORIGINAL_DTB" "$ORIGINAL_SHA"
+    systemctl disable --now r36s-usb-gadget.service 2>/dev/null || true
+    rm -f /etc/systemd/system/r36s-usb-gadget.service
+    rm -f /usr/local/sbin/r36s-usb-gadget
+    rm -f /etc/samba/r36s-usb.conf
+    rm -f /etc/r36s-usb-file-access.conf
+    systemctl daemon-reload
+    echo "Desinstalado. Backups preservados em /boot/r36s-usb-file-access. Reinicie o aparelho."
+}
+
+case "${1:-status}" in
+    activate) activate ;;
+    restore) restore ;;
+    status) status_cmd ;;
+    uninstall-info) uninstall_info ;;
+    uninstall) uninstall "$@" ;;
+    *) echo "Uso: $0 activate|restore|status|uninstall-info|uninstall --confirm"; exit 2 ;;
+esac

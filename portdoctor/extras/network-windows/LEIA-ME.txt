@@ -1,0 +1,45 @@
+PORT DOCTOR R36S - JOGOS EM REDE NO WINDOWS
+
+1. Copie ESTA PASTA INTEIRA do cartao para o computador. Ou extraia o ZIP
+   Port-Doctor-R36S-Windows-Rede da release. Mantenha .cmd e .ps1 juntos.
+
+2. Organize uma pasta dedicada, por exemplo D:\Jogos-R36S, com subpastas
+   nes, snes, gba etc. Nao compartilhe um disco inteiro ou documentos pessoais.
+
+3. Use sua rede de confianca marcada como Privada no Windows. De dois
+   cliques em "1 - Preparar no Windows.cmd" e aceite o pedido de administrador.
+   Esse preparador roda NO COMPUTADOR, nao no console.
+
+4. Informe o caminho completo da pasta, nome do compartilhamento e senha
+   exclusiva (minimo 8 caracteres). Confirme as alteracoes. Ele configura
+   R36SNetwork com leitura e gravacao, necessaria para saves. Permissoes
+   preexistentes sao mantidas. A regra SMB TCP 445 e restrita a rede Privada
+   e LocalSubnet; nao desliga o firewall nem ativa SMB1. Faca backup dos saves.
+
+5. O PC gera Jogos-em-Rede-R36S.conf ao lado do preparador. Copie SOMENTE esse
+   arquivo para /roms/tools ou /roms2/tools do R36S. Alternativa: a pasta
+   portdoctor/conf da instalacao. Nao precisa de outro .sh nem de SSH.
+
+6. PC ligado e R36S na mesma rede: Doctor > Jogos em rede > Importar
+   configuracao > Conectar jogos do Windows. A pasta Rede aparece nos
+   emuladores compativeis. Se copiou com o Doctor aberto, reabra o app.
+
+SEGURANCA E LIMITES
+- O .conf transporta senha em Base64, NAO criptografada. Nunca publique ou
+  envie esse arquivo ao GitHub. O console remove a senha da copia importada;
+  apague a copia restante no PC depois de importar.
+- Nao abra portas no roteador. Use apenas sua rede privada de confianca.
+- Mantenha PC e Wi-Fi ligados durante o jogo e a gravacao dos saves.
+- Troca de IP, pasta ou senha: execute novamente e importe o novo .conf.
+- Sao ROMs dos emuladores: nao executa .exe do Windows. As pastas ports,
+  bios e tools continuam no cartao.
+- Se faltar mount.cifs, use Instalar suporte SMB no Doctor com internet.
+  Jogar pela rede local nao exige internet depois de configurado.
+- O desempenho depende da rede/firmware; nao e igual ao cartao em todo jogo.
+- O preparador requer modulos Windows LocalAccounts, SmbShare e NetSecurity.
+  Nao foi executado para alterar o PC nos testes desta versao.
+
+Creditos: fabriciopab
+GitHub: https://github.com/Fabriciopab
+Contato: fabricio@byteforce-ai.com
+Pix voluntario: fabriciopab@hotmail.com

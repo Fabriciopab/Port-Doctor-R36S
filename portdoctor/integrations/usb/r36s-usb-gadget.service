@@ -1,0 +1,14 @@
+[Unit]
+Description=R36S USB RNDIS File Access
+After=local-fs.target systemd-modules-load.service
+ConditionPathExists=/proc/device-tree/usb@ff300000/dr_mode
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/r36s-usb-gadget start
+ExecStop=/usr/local/sbin/r36s-usb-gadget stop
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+

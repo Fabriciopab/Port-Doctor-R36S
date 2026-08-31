@@ -1,0 +1,50 @@
+PORT DOCTOR R36S - INSTALAÇÃO FÁCIL
+===================================
+
+Não é necessário usar SSH, terminal ou chmod.
+
+Método validado no R36S-V30-2025-11-18-2603 com dArkOSRE.
+Downloads oficiais: https://github.com/Fabriciopab/Port-Doctor-R36S/releases/latest
+Guia completo: https://github.com/Fabriciopab/Port-Doctor-R36S/blob/main/INSTALACAO.md
+
+INSTALAÇÃO PELO PORTMASTER
+--------------------------
+
+Quando o Port Doctor estiver no catálogo, basta selecioná-lo no PortMaster e
+escolher Instalar. Depois abra "Port Doctor R36S" no menu Ports.
+
+INSTALAÇÃO LOCAL RECOMENDADA
+----------------------------
+
+1. Extraia o pacote "Port-Doctor-R36S-Instalador" em /roms/tools ou
+   /roms2/tools.
+
+2. Abra o menu Tools e execute "Instalar Port Doctor R36S".
+
+3. Aguarde a mensagem de conclusão. O instalador valida o ZIP, detecta o
+   cartão correto, guarda a versão anterior e aplica todas as permissões.
+
+4. Abra "Port Doctor R36S" no menu Ports.
+
+Este método não usa o diretório autoinstall do PortMaster, pois esse fluxo
+travou em uma das imagens dArkOSRE usadas nos testes.
+
+PRIMEIRA ABERTURA
+-----------------
+
+O próprio Port Doctor:
+
+- prepara o runtime Love2D pelo HarbourMaster quando necessário;
+- cria as pastas de relatórios e backups;
+- corrige somente as permissões dos seus próprios scripts;
+- registra a capa e os metadados;
+- mantém um log em /roms/ports/portdoctor/log.txt.
+
+Se o port estiver no segundo cartão, o caminho começará por /roms2.
+
+Créditos: fabriciopab
+GitHub: https://github.com/Fabriciopab
+Contato: fabricio@byteforce-ai.com
+
+Pix voluntário: fabriciopab@hotmail.com
+Canal de atualização já configurado a partir da versão 0.11.1.
