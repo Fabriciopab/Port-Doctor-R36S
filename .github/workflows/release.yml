@@ -3,7 +3,7 @@ name: Publicar release
 on:
   push:
     branches: [main]
-    paths: [portdoctor/release.json]
+    paths: [portdoctor/release.json, 'portdoctor/native/**', .github/workflows/release.yml]
   workflow_dispatch:
 
 permissions:

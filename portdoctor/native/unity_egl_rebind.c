@@ -82,7 +82,8 @@ static unsigned wrapped_current(void *display, void *draw, void *read, void *con
     if (report) {
         const char *message=result ? "Port Doctor: superfície EGL atualizada; contexto de vídeo ativo.\n"
             : "Port Doctor: superfície EGL atualizada, mas o contexto ainda falhou.\n";
-        (void)write(STDERR_FILENO,message,strlen(message));
+        ssize_t written=write(STDERR_FILENO,message,strlen(message));
+        (void)written; /* Logging failure must not change the EGL result. */
     }
     return result;
 }
