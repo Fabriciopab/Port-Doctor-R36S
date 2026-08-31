@@ -1,6 +1,14 @@
 # Manual das funcionalidades do Port Doctor R36S
 
-Referência detalhada dos recursos, organizados por versão de introdução. Para começar, consulte o [guia de instalação](INSTALACAO.md) e a [página principal](README.md). Versão atual: **0.11.2**; canal oficial: **Fabriciopab/Port-Doctor-R36S**.
+Referência detalhada dos recursos, organizados por versão de introdução. Para começar, consulte o [guia de instalação](INSTALACAO.md) e a [página principal](README.md). Versão atual: **0.11.3**; canal oficial: **Fabriciopab/Port-Doctor-R36S**.
+
+## 0.11.3 — dArkOSRE e pacotes Unity
+
+O sistema foi testado no **dArkOSRE (Debian 13)**, no R36S identificado pelo mantenedor como **R36S-V30-2025-11-18-2603**. O aviso aparece na tela inicial, no Sobre e em Modelo e sistema testados. Não certifica todos os firmwares ou jogos.
+
+Em **Meus ports → selecione o jogo → Correções**, ports que incluem `unityloader` oferecem **Verificar pacote Unity**. Execute com o jogo fechado. A leitura identifica arquitetura e SHA-256 dos binários e compara os dados com `gamedata/META-INF/MANIFEST.MF`, quando disponível. Mostra arquivos ausentes, diferentes ou entradas recusadas. **X** salva o relatório.
+
+Nenhum save, biblioteca ou configuração é alterado por essa verificação. Um manifesto local não autentica o publicador e um resultado sem diferenças não comprova que o jogo abre. Para o Hollow Knight investigado, consulte os [resultados físicos e limitações](TESTES-v0.11.3.md).
 
 Utilitário comunitário de diagnóstico e manutenção protegida para handhelds Linux compatíveis com PortMaster, criado por **fabriciopab**.
 

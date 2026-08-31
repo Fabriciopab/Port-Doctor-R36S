@@ -1,9 +1,10 @@
 {
   "app": "portdoctor-r36s",
-  "version": "0.11.2",
+  "version": "0.11.3",
   "update_protocol": 1,
   "github_owner": "Fabriciopab",
   "github_repository": "Port-Doctor-R36S",
   "tested_model": "R36S-V30-2025-11-18-2603",
+  "tested_firmware": "dArkOSRE",
   "pix": "fabriciopab@hotmail.com"
 }

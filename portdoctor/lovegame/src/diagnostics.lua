@@ -545,7 +545,7 @@ function diagnostics.exportReport(systemResults, portResults, selectedPort)
     local stamp = os.date("%Y%m%d-%H%M%S")
     local path = reportDir .. "/portdoctor-" .. stamp .. ".txt"
     local lines = {
-        "Port Doctor R36S 0.11.2",
+        "Port Doctor R36S 0.11.3",
         "Autor: fabriciopab · https://github.com/Fabriciopab",
         "Gerado em: " .. os.date("%Y-%m-%d %H:%M:%S"),
         "Modo: somente leitura",

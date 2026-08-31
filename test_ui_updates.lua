@@ -30,6 +30,7 @@ dofile('portdoctor/lovegame/main.lua'); love.load()
 local function draw() draws={}; love.draw(); return table.concat(draws,'\n') end
 local function key(k) love.update(.2); love.keypressed(k); love.update(.2); return draw() end
 assert(draw():find('R36S-V30-2025-11-18-2603',1,true))
+assert(draw():find('dArkOSRE',1,true))
 for i=1,14 do key('down') end
 assert(key('return'):find('fabriciopab@hotmail.com',1,true))
 assert(draw():find('voluntária',1,true))

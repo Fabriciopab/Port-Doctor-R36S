@@ -76,7 +76,7 @@ local function entries()
         {label='Manutenção avançada',hint='Atualizações e ferramentas',page='repair'},
         {label='Atualizar Port Doctor',hint='Nova versão pelo GitHub',page='updates',icon='update'},
         {label='Contribuir com o projeto',hint='Pix opcional para apoiar',page='support',icon='heart'},
-        {label='Modelo testado',hint='R36S-V30-2025-11-18-2603',page='compatibility',icon='shield'},
+        {label='Modelo e sistema testados',hint='dArkOSRE • R36S-V30-2025-11-18-2603',page='compatibility',icon='shield'},
         {label='Sobre e créditos',hint='fabriciopab',page='about'},
     } elseif p.id=='ports' then
         local result={}; for _,name in ipairs(state.ports) do result[#result+1]={label=name,port=name} end; return result
@@ -295,10 +295,10 @@ local function primaryAction()
     elseif entry.port then state.analyzedPort=entry.port; reanalyze(); push({id='port',title=entry.port})
     elseif entry.reanalyze then reanalyze(); toast('Diagnóstico atualizado')
     elseif entry.subpage then push({id=entry.subpage,title=(entry.subpage=='repair' and 'Correções: ' or 'Diagnóstico: ')..state.analyzedPort})
-    elseif entry.page=='compatibility' then textPage('Modelo testado',
+    elseif entry.page=='compatibility' then textPage('Testado no dArkOSRE',
         'ATESTADO NO MODELO\nR36S-V30-2025-11-18-2603\n\nIdentificação da revisão informada pelo mantenedor.\n\nFirmware de referência: dArkOSRE, baseado em Debian 13, no aparelho usado para os testes do projeto.\n\nOutras revisões, clones e firmwares podem se comportar de forma diferente. Atestado neste modelo não significa que todos os jogos ou reparos funcionam.\n\nMantenha cópia dos seus saves e arquivos importantes.')
     elseif entry.page=='about' then textPage('Sobre o Port Doctor',
-        'Port Doctor R36S 0.11.2\n\nCriado por fabriciopab\nhttps://github.com/Fabriciopab\nfabricio@byteforce-ai.com\n\nPix para contribuir:\nfabriciopab@hotmail.com\n\nAtestado no R36S-V30-2025-11-18-2603.\n\nProjeto comunitário com reparos protegidos e reversíveis.\n\nNão existe correção universal: dados ausentes, builds incompatíveis e falhas internas podem exigir intervenção do autor do port.\n\nObrigado às comunidades PortMaster, dArkOSRE e ArkOS.')
+        'Port Doctor R36S 0.11.3\n\nCriado por fabriciopab\nhttps://github.com/Fabriciopab\nfabricio@byteforce-ai.com\n\nPix para contribuir:\nfabriciopab@hotmail.com\n\nTestado no dArkOSRE (Debian 13).\nR36S-V30-2025-11-18-2603.\n\nProjeto comunitário com reparos protegidos e reversíveis.\n\nNão existe correção universal: dados ausentes, builds incompatíveis e falhas internas podem exigir intervenção do autor do port.\n\nObrigado às comunidades PortMaster, dArkOSRE e ArkOS.')
     elseif entry.page then push({id=entry.page,title=entry.label,group=entry.group,icon=entry.icon})
     else textPage(entry.label,tostring(entry.hint or '')..'\n\n'..tostring(entry.detail or '')) end
 end
@@ -487,7 +487,7 @@ function love.draw()
     color(colors.accent); lg.rectangle('fill',0,0,6,60); lg.setFont(fonts.title); color(colors.text)
     icons.draw(state.page.id=='home' and 'handheld' or state.page.icon or icons.forEntry({},state.page.id),24,14,32)
     lg.print(fit(state.page.title,fonts.title,544),72,15)
-    if state.page.id=='home' then lg.setFont(fonts.small); color(colors.muted); lg.print('v0.11.2',24,66) end
+    if state.page.id=='home' then lg.setFont(fonts.small); color(colors.muted); lg.print('v0.11.3',24,66) end
     if state.analysis then
         lg.setFont(fonts.body); color(colors.info)
         lg.printf('Analisando '..tostring(state.analyzedPort)..'…\n\nVerificando arquivos, dependências e logs.\nAguarde a conclusão.',35,150,570,'center')
@@ -511,7 +511,7 @@ function love.draw()
     lg.printf(footer,18,449,604,'center')
     if state.page.id=='home' then
         lg.setFont(fonts.badge); color(colors.muted)
-        lg.printf('Atestado: R36S-V30-2025-11-18-2603',24,415,592,'center')
+        lg.printf('Testado: dArkOSRE • R36S-V30-2025-11-18-2603',24,415,592,'center')
     end
     if state.toastTime>0 then panel(22,355,596,72,colors.selected); lg.setFont(fonts.body); color(colors.text); lg.printf(state.toast,35,366,570,'center') end
     lg.pop()

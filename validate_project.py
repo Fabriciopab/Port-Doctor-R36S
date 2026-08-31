@@ -15,8 +15,8 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parent
 OUTPUTS = Path(os.environ.get('PORTDOCTOR_OUTPUTS', ROOT.parents[1] / "outputs")).resolve()
-INSTALLABLE = OUTPUTS / "Port-Doctor-R36S-v0.11.2.zip"
-EASY_INSTALLER = OUTPUTS / "Port-Doctor-R36S-Instalador-v0.11.2.zip"
+INSTALLABLE = OUTPUTS / "Port-Doctor-R36S-v0.11.3.zip"
+EASY_INSTALLER = OUTPUTS / "Port-Doctor-R36S-Instalador-v0.11.3.zip"
 
 
 def require(condition: bool, message: str):
@@ -433,12 +433,14 @@ def main():
     subprocess.run([sys.executable, str(ROOT / 'test_v090.py')], check=True)
     subprocess.run([sys.executable, str(ROOT / 'test_v0100.py')], check=True)
     subprocess.run([sys.executable, str(ROOT / 'test_v0110.py')], check=True)
+    subprocess.run([sys.executable, str(ROOT / 'test_unity_audit.py')], check=True)
     release = json.loads((ROOT / 'portdoctor/release.json').read_text())
-    require(release['version'] == '0.11.2', 'versão interna não confere')
+    require(release['version'] == '0.11.3', 'versão interna não confere')
     require(release['pix'] == 'fabriciopab@hotmail.com', 'chave Pix divergente')
     require(release['github_owner'] == 'Fabriciopab' and release['github_repository'] == 'Port-Doctor-R36S',
             'canal oficial de atualização divergente')
     require(release['tested_model'] == 'R36S-V30-2025-11-18-2603', 'modelo atestado divergente')
+    require(release['tested_firmware'] == 'dArkOSRE', 'sistema testado divergente')
     require((ROOT / 'installer/Instalar Port Doctor R36S.sh').read_bytes() ==
             (ROOT / 'portdoctor/tools/update-install.sh').read_bytes(), 'instalador local do atualizador divergente')
 
@@ -488,6 +490,7 @@ def main():
             "portdoctor/extras/network-windows/Preparar Jogos em Rede no Windows.ps1",
             "portdoctor/tools/install_metadata.py",
             "portdoctor/tools/repair_port.py",
+            "portdoctor/tools/unity_audit.py",
             "portdoctor/tools/zram-helper.sh",
             "portdoctor/tools/battery.py",
             "portdoctor/tools/memory.py",

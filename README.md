@@ -10,9 +10,13 @@ Criado por **fabriciopab**, para ajudar a comunidade a entender por que um port 
 
 > **Atestado no R36S-V30-2025-11-18-2603, com dArkOSRE.** A identificação da revisão foi informada pelo mantenedor. Os testes nesse aparelho não certificam outros modelos, clones, firmwares ou todos os jogos. O projeto permanece experimental.
 
+**Sistema operacional usado nos testes: dArkOSRE (base Debian 13).** Esse aviso também aparece na tela inicial do aplicativo e em **Modelo e sistema testados**. dArkOSRE é a referência destes testes; não deve ser confundido com uma validação de todos os outros firmwares chamados dArkOS/ArkOS.
+
+**Novo na 0.11.3:** verificação de pacotes Unity na própria tela do port, sem alterar saves. O Hollow Knight investigado ainda **não tem reparo validado**: as bibliotecas carregam e os arquivos conferem com o manifesto, mas há uma falha nativa de memória. Veja [o que foi testado e os limites](TESTES-v0.11.3.md).
+
 ## Instalação rápida — sem SSH e sem chmod
 
-1. Abra [Releases / Downloads](https://github.com/Fabriciopab/Port-Doctor-R36S/releases/latest) e baixe **`Port-Doctor-R36S-Instalador-v0.11.2.zip`** ou o instalador da versão mais recente.
+1. Abra [Releases / Downloads](https://github.com/Fabriciopab/Port-Doctor-R36S/releases/latest) e baixe **`Port-Doctor-R36S-Instalador-v0.11.3.zip`** ou o instalador da versão mais recente.
 2. Extraia o ZIP no computador. Copie a pasta inteira **`Port Doctor R36S Installer`** para **`tools`** no cartão de jogos. No console, ela corresponde a `/roms/tools` ou `/roms2/tools`.
 3. Coloque o cartão novamente no R36S, abra **Tools / Ferramentas** e execute **Instalar Port Doctor R36S**. Se o menu mostrar a pasta do instalador, entre nela primeiro.
 4. Aguarde a conclusão sem desligar. O instalador organiza os arquivos, preserva a instalação anterior e aplica as permissões automaticamente.
@@ -127,4 +131,4 @@ Agradecimentos às comunidades **PortMaster, dArkOSRE e ArkOS**, aos autores dos
 
 Código próprio sob [licença MIT](LICENSE), mantendo os créditos de **fabriciopab**. Integrações e componentes de terceiros conservam suas licenças. Jogos, ROMs, BIOS e arquivos proprietários **não acompanham** o projeto.
 
-[Arquitetura e testes](DEVELOPMENT.md) · [Verificação da release e downloads](TESTES-v0.11.2.md) · [Testes físicos da 0.11.0](TESTES-v0.11.0.md) · [Créditos](AUTHORS.md)
+[Arquitetura e testes](DEVELOPMENT.md) · [Verificação da release e downloads](TESTES-v0.11.3.md) · [Testes físicos da 0.11.0](TESTES-v0.11.0.md) · [Créditos](AUTHORS.md)

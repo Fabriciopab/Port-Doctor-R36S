@@ -348,6 +348,17 @@ function repairs.actions(details)
             enabled=command~=nil,command=command,immediate=true}
     end
 
+    if details and details.path and util.testFile(details.path .. '/unityloader') then
+        local auditHelper = (os.getenv('PORTDOCTOR_HOME') or '') .. '/tools/unity_audit.py'
+        local available = util.testFile(auditHelper)
+        actions[#actions+1] = {id='unity_audit',label='Verificar pacote Unity',
+            value='integridade e identificação dos binários',
+            detail='Com o jogo fechado, compara arquivos com o manifesto local e identifica os binários. Somente leitura: não altera saves nem instala bibliotecas. A comparação não comprova funcionamento ou autenticidade. X salva o relatório.',
+            enabled=available,immediate=true,
+            disabledReason=available and nil or 'atualize o Port Doctor para instalar o verificador',
+            command=available and ('python3 ' .. util.shellQuote(auditHelper) .. ' --port-home ' .. util.shellQuote(details.path)) or nil}
+    end
+
     if invalidLauncherHeader then
         local command = launcherHeaderCommand(details)
         actions[#actions + 1] = {

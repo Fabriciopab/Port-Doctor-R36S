@@ -1,5 +1,12 @@
 # Histórico de versões
 
+## 0.11.3 — dArkOSRE e verificação de pacotes Unity
+
+- Firmware de testes dArkOSRE destacado na interface, no Sobre, nos metadados e na documentação.
+- Verificação somente leitura de pacotes Unity: arquivos, arquitetura, SHA-256 e manifesto local, com proteção contra caminhos externos e limites de leitura.
+- Diagnóstico físico do Hollow Knight documentado sem promessa de reparo ainda não validado.
+- Preservados créditos de fabriciopab, Pix voluntário, instalador sem SSH e compatibilidade com o atualizador protocolo 1.
+
 ## 0.11.2 — pacote compatível com o atualizador
 
 - Documentação extra instalada em `portdoctor/docs/`, mantendo a lista de arquivos permitidos na raiz pelo protocolo 1 das versões anteriores.
