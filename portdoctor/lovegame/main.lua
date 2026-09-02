@@ -105,6 +105,24 @@ local function entries()
         {label='O que a limpeza preserva?',hint='Saves, jogos, bibliotecas e backups',
             detail='A limpeza reconhece metadados antigos do explorador do computador e registros nativos antigos repetidos. Mantém o registro nativo mais recente. Nunca classifica ROMs, saves, BIOS, runtimes, bibliotecas, arquivos desconhecidos ou backups como lixo.\n\nMover para a lixeira não libera espaço. Para liberar, abra cada item da lixeira, confira e escolha Apagar definitivamente.'},
     }
+    elseif p.id=='port_hub' then
+        local result={}
+        for _,package in ipairs(p.packages or {}) do
+            local size=math.max(1,math.floor((package.size or 0)/1048576))
+            result[#result+1]={label=package.name,hint=tostring(size)..' MB • '..tostring(package.files or 0)..' arquivos',portHubPackage=package}
+        end
+        if #result==0 then result[1]={label='Nenhum pacote válido',hint='Crie R36S-Ports no Windows',detail=p.text} end
+        return result
+    elseif p.id=='port_hub_destinations' then
+        local result={}
+        for _,destination in ipairs(p.destinations or {}) do
+            local card=destination.path:match('^/roms2/') and 'Cartão 2' or 'Cartão 1'
+            local free=math.floor((destination.free or 0)/1048576)
+            result[#result+1]={label=card,hint=destination.path..' • '..tostring(free)..' MB livres',
+                portHub={operation='plan',package=p.package.id,destination=destination.path}}
+        end
+        if #result==0 then result[1]={label='Nenhum cartão disponível',hint='Pasta ports não encontrada'} end
+        return result
     elseif p.id=='files' then
         local result={}
         if p.path~='' then
@@ -178,7 +196,7 @@ Com PC e R36S na mesma rede local: Jogos em rede → Importar configuração →
 IMPORTANTE
 O PC deve ficar ligado. Não desconecte durante gravações de saves. O .conf transporta uma senha apenas codificada: não compartilhe nem envie ao GitHub. Após importar, apague a cópia restante no PC.
 
-Use somente rede privada de confiança. Isso não executa .exe do Windows e não carrega as pastas ports, bios ou tools pela rede.]]}
+Use somente rede privada de confiança. Isso não executa .exe do Windows. ROMs podem ser usadas pela rede; ports são copiados com segurança pelo Port Hub local e continuam rodando pelo cartão.]]}
         end
         for _,a in ipairs(actions) do if not p.group or a.group==p.group then
             result[#result+1]={label=a.label,hint=a.enabled and a.value or 'Consultar disponibilidade',action=a}
@@ -227,6 +245,22 @@ local function finishJob(message)
             textPage(data.title or 'Atualizar Port Doctor',data.text or output)
             state.lastOutput=tostring(data.title)..'\n'..tostring(data.text)
             if data.ok and data.kind=='ready' then state.updateExitTimer=2 end
+        end
+        return
+    end
+    if action.portHub then
+        local ok,data=pcall(storage.decode,output)
+        state.job=nil; back()
+        if not ok or type(data)~='table' then textPage('Falha no Port Hub','Resposta não reconhecida.\n'..output); return end
+        if data.ok and data.kind=='packages' then
+            push({id='port_hub',title=data.title,packages=data.packages,destinations=data.destinations,text=data.text})
+        elseif data.ok and data.kind=='plan' then
+            push({id='confirm',title=data.title,stage=1,scroll=0,text=data.text,
+                action={label=data.title,portHub=true,command=integrations.portHubCommand('execute',data.package,data.destination,data.token),confirmation=data.text}})
+        else
+            state.lastOutput=(data.title or 'Port Hub')..'\n'..tostring(data.text or output)
+            textPage(data.title or 'Port Hub',data.text or output)
+            refreshPorts(); refreshActions()
         end
         return
     end
@@ -283,6 +317,10 @@ local function primaryAction()
     end
     local entry=entries()[p.selection]; if not entry then return end
     if entry.storage then startStorage(entry.storage)
+    elseif entry.portHub then startJob({label='Preparar instalação',portHub=true,
+        command=integrations.portHubCommand(entry.portHub.operation,entry.portHub.package,entry.portHub.destination)})
+    elseif entry.portHubPackage then push({id='port_hub_destinations',title='Onde instalar?',package=entry.portHubPackage,
+        destinations=state.page.destinations})
     elseif entry.folderOptions then push({id='folder_options',title='Opções da pasta',path=p.path,free=p.free})
     elseif entry.clipboard then state.clipboard={operation=entry.clipboard,path=entry.file.path,name=entry.file.name}; back(); toast('Escolha o destino e use Colar aqui')
     elseif entry.clearClipboard then state.clipboard=nil; toast('Área de transferência limpa')
@@ -298,7 +336,7 @@ local function primaryAction()
     elseif entry.page=='compatibility' then textPage('Testado no dArkOSRE',
         'ATESTADO NO MODELO\nR36S-V30-2025-11-18-2603\n\nIdentificação da revisão informada pelo mantenedor.\n\nFirmware de referência: dArkOSRE, baseado em Debian 13, no aparelho usado para os testes do projeto.\n\nOutras revisões, clones e firmwares podem se comportar de forma diferente. Atestado neste modelo não significa que todos os jogos ou reparos funcionam.\n\nMantenha cópia dos seus saves e arquivos importantes.')
     elseif entry.page=='about' then textPage('Sobre o Port Doctor',
-        'Port Doctor R36S 0.11.5\n\nCriado por fabriciopab\nhttps://github.com/Fabriciopab\nfabricio@byteforce-ai.com\n\nPix para contribuir:\nfabriciopab@hotmail.com\n\nTestado no dArkOSRE (Debian 13).\nR36S-V30-2025-11-18-2603.\n\nProjeto comunitário com reparos protegidos e reversíveis.\n\nNão existe correção universal: dados ausentes, builds incompatíveis e falhas internas podem exigir intervenção do autor do port.\n\nObrigado às comunidades PortMaster, dArkOSRE e ArkOS.')
+        'Port Doctor R36S 0.12.0\n\nCriado por fabriciopab\nhttps://github.com/Fabriciopab\nfabricio@byteforce-ai.com\n\nPix para contribuir:\nfabriciopab@hotmail.com\n\nTestado no dArkOSRE (Debian 13).\nR36S-V30-2025-11-18-2603.\n\nProjeto comunitário com reparos protegidos e reversíveis.\n\nNão existe correção universal: dados ausentes, builds incompatíveis e falhas internas podem exigir intervenção do autor do port.\n\nObrigado às comunidades PortMaster, dArkOSRE e ArkOS.')
     elseif entry.page then push({id=entry.page,title=entry.label,group=entry.group,icon=entry.icon})
     else textPage(entry.label,tostring(entry.hint or '')..'\n\n'..tostring(entry.detail or '')) end
 end
@@ -487,7 +525,7 @@ function love.draw()
     color(colors.accent); lg.rectangle('fill',0,0,6,60); lg.setFont(fonts.title); color(colors.text)
     icons.draw(state.page.id=='home' and 'handheld' or state.page.icon or icons.forEntry({},state.page.id),24,14,32)
     lg.print(fit(state.page.title,fonts.title,544),72,15)
-    if state.page.id=='home' then lg.setFont(fonts.small); color(colors.muted); lg.print('v0.11.5',24,66) end
+    if state.page.id=='home' then lg.setFont(fonts.small); color(colors.muted); lg.print('v0.12.0',24,66) end
     if state.analysis then
         lg.setFont(fonts.body); color(colors.info)
         lg.printf('Analisando '..tostring(state.analyzedPort)..'…\n\nVerificando arquivos, dependências e logs.\nAguarde a conclusão.',35,150,570,'center')
