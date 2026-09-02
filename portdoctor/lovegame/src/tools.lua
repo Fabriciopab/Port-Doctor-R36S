@@ -19,6 +19,15 @@ local function homePath(relative)
     return home ~= "" and (home .. "/" .. relative) or ""
 end
 
+function tools.portHubCommand(operation, packageId, destination, token)
+    local helper = homePath("tools/port_hub.py")
+    local parts = {"python3", util.shellQuote(helper), util.shellQuote(operation)}
+    if packageId then parts[#parts + 1] = util.shellQuote(packageId) end
+    if destination then parts[#parts + 1] = util.shellQuote(destination) end
+    if token then parts[#parts + 1] = util.shellQuote(token) end
+    return table.concat(parts, " ")
+end
+
 local function command(path, arguments, root)
     if path == "" or not util.testFile(path) then
         return nil
@@ -51,6 +60,7 @@ function tools.actions()
     local storageHelper = homePath("integrations/system/storage-doctor.sh")
     local usbHelper = homePath("integrations/usb/usb-bridge.sh")
     local networkHelper = homePath("integrations/network/network-manager.sh")
+    local portHubHelper = homePath("tools/port_hub.py")
     local usbInstalled = util.testFile("/usr/local/sbin/r36s-usb-control", true)
         and util.testFile("/etc/r36s-usb-file-access.conf")
     local networkConfigured = util.testFile("/etc/r36s-network/config")
@@ -147,6 +157,15 @@ function tools.actions()
             detail = "Consulta servidor, compartilhamento, montagem CIFS e quantidade de sistemas ligados.",
             enabled = command(networkHelper, "status", true) ~= nil,
             command = command(networkHelper, "status", true), immediate = true,
+        },
+        {
+            id = "network_port_hub", group = "REDE", label = "Instalar ports do Windows",
+            value = networkConfigured and "Port Hub local" or "importe o .conf",
+            detail = "Lista pacotes da pasta R36S-Ports no computador, permite escolher o cartão e instala com conferência, sem sobrescrever jogos ou saves.",
+            enabled = networkConfigured and util.testFile(portHubHelper),
+            command = util.testFile(portHubHelper) and command(networkHelper, "mount-only", true)
+                and (command(networkHelper, "mount-only", true) .. " && python3 " .. util.shellQuote(portHubHelper) .. " list") or nil,
+            immediate = true, portHub = true,
         },
         {
             id = "network_connect", group = "REDE", label = "Conectar jogos do Windows",
