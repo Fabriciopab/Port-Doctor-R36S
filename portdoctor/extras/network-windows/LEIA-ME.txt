@@ -31,8 +31,9 @@ SEGURANCA E LIMITES
 - Nao abra portas no roteador. Use apenas sua rede privada de confianca.
 - Mantenha PC e Wi-Fi ligados durante o jogo e a gravacao dos saves.
 - Troca de IP, pasta ou senha: execute novamente e importe o novo .conf.
-- Sao ROMs dos emuladores: nao executa .exe do Windows. As pastas ports,
-  bios e tools continuam no cartao.
+- ROMs dos emuladores podem ser usadas pela rede. O Port Hub tambem reconhece
+  uma pasta R36S-Ports e copia os ports escolhidos para o cartao; nao executa
+  .exe do Windows. As pastas bios e tools continuam no cartao.
 - Se faltar mount.cifs, use Instalar suporte SMB no Doctor com internet.
   Jogar pela rede local nao exige internet depois de configurado.
 - O desempenho depende da rede/firmware; nao e igual ao cartao em todo jogo.
