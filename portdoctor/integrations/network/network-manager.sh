@@ -395,6 +395,27 @@ connect_games() {
     return 0
 }
 
+mount_share_only() {
+    if ! load_configuration; then
+        printf 'Port Doctor: importe primeiro a configuração criada no Windows.\n' >&2
+        return 1
+    fi
+    if ! check_cifs_support; then
+        printf 'Port Doctor: suporte SMB/CIFS ausente; use Instalar suporte SMB.\n' >&2
+        return 1
+    fi
+    mkdir -p "$MOUNT_ROOT"
+    if cifs_is_mounted; then
+        return 0
+    fi
+    if ! mount_windows_share; then
+        generate_diagnostic
+        printf 'Port Doctor: não foi possível abrir o compartilhamento do Windows.\n' >&2
+        return 1
+    fi
+    log_line "Compartilhamento montado para o Port Hub."
+}
+
 disconnect_games() {
     if ! unmount_bind_folders; then
         show_message "Nao foi possivel desconectar" "Algum jogo ou emulador ainda esta usando uma pasta Rede. Feche o jogo e tente novamente."
@@ -634,8 +655,11 @@ run_cli() {
         install-smb)
             install_smb_support_cli
             ;;
+        mount-only)
+            mount_share_only
+            ;;
         *)
-            printf 'Uso: %s status|import|connect|disconnect|diagnostic|install-smb\n' "$0" >&2
+            printf 'Uso: %s status|import|connect|disconnect|diagnostic|install-smb|mount-only\n' "$0" >&2
             return 2
             ;;
     esac
