@@ -1,5 +1,13 @@
 # Histórico de versões
 
+## 0.12.0 — Port Hub local
+
+- Instalação de ports guardados no computador por meio do compartilhamento SMB já configurado pelo Port Doctor.
+- Escolha entre os cartões 1 e 2, prévia de tamanho e arquivos e bloqueio de espaço insuficiente.
+- Cópia transacional, conferência final, permissão automática dos launchers e limpeza em caso de falha.
+- Proteção contra sobrescrita de jogos e saves, links simbólicos, caminhos externos e estruturas excessivas.
+- Interface integrada ao gamepad em Jogos em rede, sem terminal, SSH ou novo cadastro de senha.
+
 ## 0.11.5 — Hollow Knight: abertura e imagem
 
 - Complemento para tela roxa/preta do build validado: texturas sem redução e desfoque Alto, preservando todas as outras preferências.

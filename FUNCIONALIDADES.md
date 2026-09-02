@@ -1,6 +1,15 @@
 # Manual das funcionalidades do Port Doctor R36S
 
-Referência detalhada dos recursos, organizados por versão de introdução. Para começar, consulte o [guia de instalação](INSTALACAO.md) e a [página principal](README.md). Versão atual: **0.11.5**; canal oficial: **Fabriciopab/Port-Doctor-R36S**.
+Referência detalhada dos recursos, organizados por versão de introdução. Para começar, consulte o [guia de instalação](INSTALACAO.md) e a [página principal](README.md). Versão atual: **0.12.0**; canal oficial: **Fabriciopab/Port-Doctor-R36S**.
+
+## 0.12.0 — Port Hub local
+
+- Lista ports guardados na pasta `R36S-Ports` ou `ports` do compartilhamento do Windows.
+- Permite escolher o cartão 1 (`/roms/ports`) ou cartão 2 (`/roms2/ports`).
+- Valida launcher `.sh`, profundidade, quantidade de arquivos, links simbólicos e espaço livre antes de copiar.
+- Usa área temporária no cartão, confere quantidade e tamanho e só então publica o port no destino.
+- Não sobrescreve pastas, launchers, capas ou saves existentes. Uma falha remove a instalação parcial.
+- Ajusta a permissão dos launchers e grava um relatório local; capas continuam sendo sincronizadas pela ferramenta própria do Doctor.
 
 ## 0.11.5 — abertura e imagem do Hollow Knight
 
